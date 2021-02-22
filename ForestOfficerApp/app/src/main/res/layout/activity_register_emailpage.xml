@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight = "@dimen/activity_horizontal_margin"
+    android:paddingTop = "@dimen/activity_vertical_margin"
+    android:paddingBottom = "@dimen/activity_vertical_margin">
+
+    <TextView
+        android:text = "REGISTER"
+        android:layout_width="wrap_content"
+        android:layout_height = "wrap_content"
+        android:textSize = "35dp"
+        android:id = "@+id/registerTextView"
+        android:layout_alignParentTop = "true"
+        android:layout_centerHorizontal = "true" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text = "Enter your Email"
+        android:textSize="25dp"
+        android:id="@+id/registerEmailTextView"
+        android:layout_above="@id/registerEmailEditText"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentLeft = "true"
+        android:layout_alignParentStart = "true"
+        android:layout_alignParentRight = "true"
+        android:layout_alignParentEnd = "true" />
+
+    <EditText
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:id = "@+id/registerEmailEditText"
+        android:hint = "EMAIL"
+        android:focusable = "true"
+        android:textColorHighlight = "#ff7eff15"
+        android:textColorHint = "#ffff25e6"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft = "true"
+        android:layout_alignParentStart = "true"
+        android:layout_alignRight="@id/registerEmailTextView"
+        android:layout_alignEnd="@id/registerEmailTextView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/submitButton_name"
+        android:id="@+id/registerEmailSubmit"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/registerTextView"
+        android:layout_toStartOf="@+id/registerTextView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cancelButton_name"
+        android:id="@+id/registerCancel"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/registerTextView"
+        android:layout_toEndOf="@+id/registerTextView" />
+
+</RelativeLayout>

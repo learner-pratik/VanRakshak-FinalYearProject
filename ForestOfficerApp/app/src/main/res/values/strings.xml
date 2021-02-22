@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">ForestOfficerApp</string>
+    <string name="registerButton_name">REGISTER</string>
+    <string name="loginButton_name">LOGIN</string>
+    <string name="submitButton_name">SUBMIT</string>
+    <string name="cancelButton_name">CANCEL</string>
+    <string name="registrationPage_name">REGISTER</string>
+    <string name="password_specifications">
+        Password must satisfy following constraints\n
+        \t \u2022 Minimum length - 8 characters\n
+        \t \u2022 Maximum length - 12 characters\n
+        \t \u2022 Must contain at least one uppercase character\n
+        \t \u2022 Must contain at least one lowercase character\n
+        \t \u2022 Must contain at least one digit\n
+        \t \u2022 Must contain at least one special character (@$&amp;#)\n
+    </string>
+</resources>
