@@ -19,13 +19,13 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-public class MailService extends AsyncTask<String, String, Boolean> {
+public class MailService extends AsyncTask<String, Void, Void> {
 
-    boolean check = false;
+    private boolean check = false;
     private static final String username = "pratiknaik4799@gmail.com";
     private static final String password = "uzumakinaruto@4799";
 
-    private boolean sendEmail(String OTP) {
+    private void sendEmail(String OTP) {
 
         String textMessage = "Please enter this OTP in the Android application\n"+"OTP - "+OTP;
 
@@ -81,11 +81,15 @@ public class MailService extends AsyncTask<String, String, Boolean> {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
-        return check;
     }
 
     @Override
-    protected Boolean doInBackground(String[] strings) {
-        return sendEmail(strings[0]);
+    protected Void doInBackground(String[] strings) {
+        sendEmail(strings[0]);
+        return null;
+    }
+
+    public boolean getEmailStatus() {
+        return check;
     }
 }

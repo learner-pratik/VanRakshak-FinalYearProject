@@ -86,7 +86,7 @@ public class LoginActivity extends Activity {
         }
 
         SendData sendData = new SendData();
-        JSONObject receivedData = sendData.sendJsonData(this, jsonObject);
+        JSONObject receivedData = sendData.sendJsonData(this, jsonObject, "Login");
 
         try {
             answer = (receivedData.getBoolean("email") && receivedData.getBoolean("password"));

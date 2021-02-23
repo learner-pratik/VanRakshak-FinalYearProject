@@ -58,7 +58,7 @@ public class RegisterPasswordActivity extends Activity {
             e.printStackTrace();
         }
         SendData sendData = new SendData();
-        JSONObject response = sendData.sendJsonData(RegisterPasswordActivity.this, jsonObject);
+        JSONObject response = sendData.sendJsonData(RegisterPasswordActivity.this, jsonObject, "Register");
 
     }
 

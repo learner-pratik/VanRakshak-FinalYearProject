@@ -13,27 +13,48 @@ import org.json.JSONObject;
 
 public class SendData {
 
-    public static final String BASE_URL = "https://encd7j4cwr4gx6f.m.pipedream.net";
+    private static final String BASE_URL = "http:localhost:3000";
+    private static final String loginURL = "/login";
+    private static final String logoutURL = "/logout";
+    private static final String registerURL = "/register";
+    private static final String emailURL = "/check";
     JSONObject receivedResponse = null;
 
-    public JSONObject sendJsonData(Context context, JSONObject object) {
+    public JSONObject sendJsonData(Context context, JSONObject object, String requestType) {
+
+        String requestURL;
+
+        switch (requestType) {
+            case "Login" :
+                requestURL = BASE_URL+loginURL;
+                break;
+            case "Logout" :
+                requestURL = BASE_URL+logoutURL;
+                break;
+            case "Register" :
+                requestURL = BASE_URL+registerURL;
+                break;
+            case "Email" :
+                requestURL = BASE_URL+emailURL;
+                break;
+            default:
+                requestURL = BASE_URL;
+                break;
+        }
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                BASE_URL, object, new Response.Listener<JSONObject>() {
+                requestURL, object, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 receivedResponse = response;
                 System.out.println("post request success");
                 System.out.println(response);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                System.out.println("post request failure");
-                error.printStackTrace();
-            }
+        }, error -> {
+            System.out.println("post request failure");
+            error.printStackTrace();
         });
 
         requestQueue.add(jsonObjectRequest);
