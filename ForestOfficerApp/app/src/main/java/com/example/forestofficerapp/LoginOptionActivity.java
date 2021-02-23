@@ -20,8 +20,8 @@ public class LoginOptionActivity extends Activity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent registerActivityIntent = new Intent(LoginOptionActivity.this, RegisterActivity.class);
-                startActivity(registerActivityIntent);
+                Intent registerEmailActivityIntent = new Intent(LoginOptionActivity.this, RegisterEmailActivity.class);
+                startActivity(registerEmailActivityIntent);
             }
         });
 

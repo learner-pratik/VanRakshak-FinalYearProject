@@ -2,6 +2,7 @@ package com.example.forestofficerapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +32,7 @@ public class RegisterEmailActivity extends Activity {
         Button cancelButton = findViewById(R.id.registerCancel);
 
         registerEmailSubmit.setOnClickListener(v -> {
-            try {
+            if (checkInternetConnection(RegisterEmailActivity.this)) {
                 if (checkRegisteredEmail()) {
                     sendOtp();
                     Intent otpActivityIntent = new Intent(RegisterEmailActivity.this, RegisterOtpActivity.class);
@@ -42,8 +43,8 @@ public class RegisterEmailActivity extends Activity {
                 } else {
                     Toast.makeText(RegisterEmailActivity.this, "Email is not registered", Toast.LENGTH_SHORT).show();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } else {
+                Toast.makeText(RegisterEmailActivity.this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -53,15 +54,30 @@ public class RegisterEmailActivity extends Activity {
         });
     }
 
+    private boolean checkInternetConnection(RegisterEmailActivity registerEmailActivity) {
+        InternetConnection connection = new InternetConnection(registerEmailActivity);
+        connection.execute();
+        while (true) {
+            if (connection.getStatus().equals(AsyncTask.Status.FINISHED))
+                break;
+        }
+        return connection.getInternetStatus();
+    }
+
     private void sendOtp() {
         generatedOtp = getOTP();
         mailService.execute(generatedOtp);
-        emailSent = mailService.check;
+        while (true) {
+            if (mailService.getStatus().equals(AsyncTask.Status.FINISHED))
+                break;
+        }
+        emailSent = mailService.getEmailStatus();
     }
 
-    private boolean checkRegisteredEmail() throws JSONException {
+    private boolean checkRegisteredEmail() {
 
         JSONObject postData = new JSONObject();
+        Boolean response = false;
         try {
             postData.put("email", emailText.getText().toString());
         } catch (JSONException e) {
@@ -69,9 +85,13 @@ public class RegisterEmailActivity extends Activity {
         }
 
         SendData sendData = new SendData();
-        JSONObject receivedData = sendData.sendJsonData(this, postData);
+        JSONObject receivedData = sendData.sendJsonData(this, postData, "Email");
 
-        Boolean response = receivedData.getBoolean("email");
+        try {
+            response = receivedData.getBoolean("email");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return response;
     }
 
