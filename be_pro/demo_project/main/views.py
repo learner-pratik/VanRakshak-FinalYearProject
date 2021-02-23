@@ -9,7 +9,7 @@ from django.utils import timezone
 from .models import *
 
 class Login_api(APIView):
-    # permission_classes = (IsAuthenticated,)  
+    # permission_classes = (IsAuthenticated,) No token required 
 
     def post(self, request):
         print(request.data)
@@ -37,6 +37,8 @@ class Logout_api(APIView):
             data = session.get_decoded()
             user_id_list.append(data.get('_auth_user_id', None))
         print(User.objects.filter(id__in=user_id_list))
+        #
+
         # print(request.data)
         request.user.auth_token.delete()
         logout(request)
