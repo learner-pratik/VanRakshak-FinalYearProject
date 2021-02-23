@@ -38,11 +38,3 @@ obj/
 
 ###server###
 .vscode
-
-# virtual env
-env/bin/*
-env/include/*
-env/lib/*
-env/lib64/*
-env/share/*
-env/pyvenv.cfg
