@@ -18,28 +18,43 @@ public class SendData {
     private static final String logoutURL = "/logout";
     private static final String registerURL = "/register";
     private static final String emailURL = "/check";
+    private static final String taskURL = "/taskreport";
+    private static final String reportURL = "/report";
     JSONObject receivedResponse = null;
 
-    public JSONObject sendJsonData(Context context, JSONObject object, String requestType) {
+    public Object sendJsonData(Context context, JSONObject object, String requestType) {
 
         String requestURL;
 
         switch (requestType) {
-            case "Login" :
-                requestURL = BASE_URL+loginURL;
+            case "Login" : {
+                requestURL = BASE_URL + loginURL;
                 break;
-            case "Logout" :
-                requestURL = BASE_URL+logoutURL;
+            }
+            case "Logout" : {
+                requestURL = BASE_URL + logoutURL;
                 break;
-            case "Register" :
-                requestURL = BASE_URL+registerURL;
+            }
+            case "Register" : {
+                requestURL = BASE_URL + registerURL;
                 break;
-            case "Email" :
-                requestURL = BASE_URL+emailURL;
+            }
+            case "Email" : {
+                requestURL = BASE_URL + emailURL;
                 break;
-            default:
+            }
+            case "Task" : {
+                requestURL = BASE_URL + taskURL;
+                break;
+            }
+            case "Report" : {
+                requestURL = BASE_URL + reportURL;
+                break;
+            }
+            default: {
                 requestURL = BASE_URL;
                 break;
+            }
         }
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);

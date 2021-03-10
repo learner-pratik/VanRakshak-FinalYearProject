@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/alert_navigation"
+            android:icon="@drawable/ic_add_alert_24px"
+            android:title="@string/navigation_alert_name"/>
+        <item
+            android:id="@+id/map_navigation"
+            android:icon="@drawable/ic_map_navigation_24px"
+            android:title="@string/navigation_map_name"/>
+        <item
+            android:id="@+id/profile_navigation"
+            android:icon="@drawable/ic_person_24px"
+            android:title="@string/navigation_profile_name"/>
+        <item
+            android:id="@+id/report_navigation"
+            android:icon="@drawable/ic_report_topic_24px"
+            android:title="@string/navigation_report_name"/>
+        <item
+            android:id="@+id/task_navigation"
+            android:icon="@drawable/ic_content_task_24px"
+            android:title="@string/navigation_task_name"/>
+
+    </group>
+</menu>
