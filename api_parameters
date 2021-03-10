@@ -4,7 +4,9 @@ request - {
 	"email" : "<emailid>"
 }
 response - {
-	"email" : "true/false(boolean)"
+	"email" : "1,2,3" // 1 for email incorrect, 
+			  //  2 for password already registered for email
+			  //  3 for correct email address
 }
 
 2. save password

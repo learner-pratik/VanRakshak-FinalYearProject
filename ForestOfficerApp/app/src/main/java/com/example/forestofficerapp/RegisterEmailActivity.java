@@ -155,31 +155,31 @@ public class RegisterEmailActivity extends Activity {
         protected Integer doInBackground(String... strings) {
 
             submittedMail = strings[0];
-//            JSONObject postData = new JSONObject();
-//            Boolean response = false;
-//            try {
-//                postData.put("email", strings[0]);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            SendData sendData = new SendData();
-//            JSONObject receivedData = sendData.sendJsonData(activityWeakReference.get(), postData, "Email");
-//
-//            try {
-//                response = receivedData.getBoolean("email");
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            return response;
+            JSONObject postData = new JSONObject();
+            int response = 0;
             try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
+                postData.put("email", strings[0]);
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            return 1;
+            SendData sendData = new SendData();
+            JSONObject receivedData = (JSONObject) sendData.sendJsonData(activityWeakReference.get(), postData, "Email");
+
+            try {
+                response = receivedData.getInt("email");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return response;
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//
+//            return 1;
         }
 
         @Override

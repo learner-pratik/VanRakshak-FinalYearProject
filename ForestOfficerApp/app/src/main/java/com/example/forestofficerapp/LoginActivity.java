@@ -130,48 +130,48 @@ public class LoginActivity extends Activity {
             registeredEmail = strings[0];
             registeredPassword = strings[1];
 
-//            JSONObject jsonObject = new JSONObject();
-//            try {
-//                jsonObject.put("email", registeredEmail);
-//                jsonObject.put("password", registeredPassword);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            SendData sendData = new SendData();
-//            JSONObject receivedData = (JSONObject) sendData.sendJsonData(loginActivityWeakReference.get(), jsonObject, "Login");
-//
-//            Boolean verifiedEmail = false, verifiedPassword = false, passwordRegistered = false;
-//            try {
-//                verifiedEmail = receivedData.getBoolean("email");
-//                verifiedPassword = receivedData.getBoolean("password");
-//                passwordRegistered = receivedData.getBoolean("password_registration");
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            if (!verifiedEmail) {
-//                return 1;
-//            } else if (!verifiedPassword && passwordRegistered) {
-//                return 2;
-//            } else if (!passwordRegistered) {
-//                return 3;
-//            } else if (verifiedEmail && verifiedPassword) {
-//                try {
-//                    userProfile = receivedData.getJSONObject("user");
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                return 4;
-//            }
-//            return 0;
+            JSONObject jsonObject = new JSONObject();
             try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
+                jsonObject.put("email", registeredEmail);
+                jsonObject.put("password", registeredPassword);
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            return 4;
+            SendData sendData = new SendData();
+            JSONObject receivedData = (JSONObject) sendData.sendJsonData(loginActivityWeakReference.get(), jsonObject, "Login");
+
+            Boolean verifiedEmail = false, verifiedPassword = false, passwordRegistered = false;
+            try {
+                verifiedEmail = receivedData.getBoolean("email");
+                verifiedPassword = receivedData.getBoolean("password");
+                passwordRegistered = receivedData.getBoolean("password_registration");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            if (!verifiedEmail) {
+                return 1;
+            } else if (!verifiedPassword && passwordRegistered) {
+                return 2;
+            } else if (!passwordRegistered) {
+                return 3;
+            } else if (verifiedEmail && verifiedPassword) {
+                try {
+                    userProfile = receivedData.getJSONObject("user");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return 4;
+            }
+            return 0;
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//
+//            return 4;
         }
 
         @Override
@@ -199,24 +199,24 @@ public class LoginActivity extends Activity {
                 case 4: {
                     loginActivity.loginTextView.setText("LOGGING YOU");
 
-//                    try {
-//                        profileName = userProfile.getString("name");
-//                        profileEmail = userProfile.getString("email");
-//                        profileDesignation = userProfile.getString("designation");
-//                        profileBeat = userProfile.getString("beat");
-//                        profileRange = userProfile.getString("range");
-//                        profileDivision = userProfile.getString("division");
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
+                    try {
+                        profileName = userProfile.getString("name");
+                        profileEmail = userProfile.getString("email");
+                        profileDesignation = userProfile.getString("designation");
+                        profileBeat = userProfile.getString("beat");
+                        profileRange = userProfile.getString("range");
+                        profileDivision = userProfile.getString("division");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
                     SaveSharedPreference.setEmail(loginActivity, registeredEmail);
                     SaveSharedPreference.setPassword(loginActivity, registeredPassword);
-//                    SaveSharedPreference.setName(loginActivity, profileName);
-//                    SaveSharedPreference.setDesignation(loginActivity, profileDesignation);
-//                    SaveSharedPreference.setBeat(loginActivity, profileBeat);
-//                    SaveSharedPreference.setRange(loginActivity, profileRange);
-//                    SaveSharedPreference.setDivision(loginActivity, profileDivision);
+                    SaveSharedPreference.setName(loginActivity, profileName);
+                    SaveSharedPreference.setDesignation(loginActivity, profileDesignation);
+                    SaveSharedPreference.setBeat(loginActivity, profileBeat);
+                    SaveSharedPreference.setRange(loginActivity, profileRange);
+                    SaveSharedPreference.setDivision(loginActivity, profileDivision);
                     break;
                 }
                 default:
