@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Add live realtime data</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; } 
+    .dropbtn {
+    color: #3CB371;
+    padding: 14px;
+    font-size: 20px;
+    border-color: #3CB371;
+    border-width: medium;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.dropdown {
+  position: absolute;
+  display: inline-block;
+  /* float: left; */
+  margin-left: 10px;
+  z-index: 3;
+  overflow: visible;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #8bf8bc;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 3;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 20px;
+}
+
+.dropdown-content a:hover {background-color: #3e8e41;color: #fff;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropbtn {background-color: #3e8e41;color: white;}
+
+ul {
+  list-style-type: none;
+  padding:7px 20px 0px 0px;
+  overflow: visible;
+  background-color: #fff;
+  z-index:2;
+  position: relative;
+  margin-top: 0;
+  height: 63px;
+}
+
+li {
+  float: right;
+  z-index: 2;
+  position: relative;
+}
+
+li a {
+    display: block;
+    color: #3CB371;
+    text-align: center;
+    padding: 14px 25px;
+    text-decoration: none;
+    letter-spacing: 2px;
+    font-size: 20px;
+    
+}
+
+li a:hover {
+  color: #006400;
+  /* border-bottom: 0px solid #006400; */
+}
+
+select{
+    z-index: 1;
+    position: relative;
+    padding: 12px;
+    /* border: 0; */
+    border-radius: 7px;
+    letter-spacing: 1px;
+    font-size: 20px;
+    color: #3CB371;
+    background: #fff;
+    border-width: medium;
+    border-color: #3CB371;
+    outline: none;
+}
+option{
+    font-size: 20px;
+    color: black;
+    background: #8bf8bc;
+}
+
+p{
+    position: relative;
+    font-size: 25px;
+    margin:0px;
+}
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body onload="selanimal(1)">
+    <ul>
+        <div class="dropdown">
+            <button class="dropbtn">Dropdown</button>
+            <div class="dropdown-content">
+                <a href='{% url 'addanimal' %}'>Add Animal</a>
+                <a href='{% url 'addcamera' %}'>Add Camera</a>
+                <a href='{% url 'addforest_employee' %}'>Add Forest Employee</a>
+                <a href='{% url 'allotrange' %}'>Allocate Range</a>
+            </div>
+        </div>
+        <div style="z-index: 1;position: relative;width: 420px;left: 150px;">
+            <div style="z-index: 1;position: absolute;">
+                <select id="animal" onchange="selanimal(0)">
+                    <option disabled selected>Select Animal</option>
+                    <option value="all">All</option>
+                    {% for i in animals %}
+                    <option value={{ i }}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="aid" style="z-index: 1;position: absolute;right: 0;"></div>
+        </div>
+        <li><a href='{% url 'logout_server' %}'>Logout</a></li>
+    </ul>
+<div id="map"></div>
+
+<script>
+    //Access token
+	mapboxgl.accessToken = 'pk.eyJ1Ijoib21rYXIyMSIsImEiOiJjanRxc3hoamcwZDNtNGRxZGNnaXF2ZHU3In0.Ovq0lb6DSdnLkIMMb32UPA';
+
+    //Load MAp
+    var main_map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom: 0
+    });
+
+    //Main Dictionary of required animal and their type
+    mdict = {{ sdict|safe }};
+    mlat = {{ slat|safe }}
+    mlon = {{ slon|safe }}
+
+    //Temp Dictionary of required animal and their type
+    dict = {};
+    lat = {}
+    lon = {}
+
+    
+
+    //Icon set
+    const images =['https://as1.ftcdn.net/jpg/02/37/17/62/500_F_237176220_yDRBwV4Qqvs0JM7fTmhb2fs39A1LTUSI.jpg'];
+
+    //Defining structure of GeoJSON object of all markers
+    //    "data": {
+    //    "type": "Feature",
+    //    "geometry": {
+    //        "type": "Point",
+    //        "coordinates": [-77.0323, 38.9131]
+    //      },
+    //    "properties": {
+    //        "title": "Mapbox DC",
+    //        "marker-symbol": "monument"
+    //      }
+    //  }
+
+    function marker(id,coordinates){ 
+    this.type = "Feature"; 
+    this.geometry = {"type":"Point","coordinates":coordinates};
+    this.properties = {"title":id};
+    } 
+
+    function loadImage(key,c,map){
+        return new Promise(resolve => {
+            setTimeout(() => {
+                map.loadImage('../static/animals/'+key+'.png', function(error, res) {
+                console.log(key,c)
+                map.addImage(key, res)
+            });
+            resolve("done");
+            }, 2000);
+        });
+    }
+
+    function getlocation(){
+        console.log(Object.keys(dict))
+        $.ajax({
+        type: "POST",
+        url: "{% url 'location' %}",  
+        dataType:'json', 
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+              animals:(["lion","tiger"]).toString()},   /* Passing the text data */
+        success:  function(response){
+               console.log(response);
+               dict=response['sdict']
+               lat=response['slat']
+               lon=response['slon']
+           },
+        error: function(response){
+            console.log(response);
+        }
+        });
+    }
+
+    var timer=false
+    async function showmap() {
+        var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom: 0
+        });
+        //Marker Initialization
+        var c = 0;
+        for(var key in dict){
+            var s=await loadImage(key,c,map);
+            console.log(s);
+            c += 1;
+            for(var value in dict[key]){
+                //longitude,latitude
+		        console.log(key,dict[key][value],c,value);	
+                let pin  = new marker(dict[key][value],[lon[key][value],lat[key][value]]); 
+                map.addSource(dict[key][value], { type: 'geojson', data: pin });
+                map.addLayer({
+                'id': dict[key][value],
+                'type': 'symbol',
+                'source': dict[key][value],
+                'layout': {
+                    'icon-image': key,
+                    'icon-size': 0.05
+                    }
+                });
+                // map.removeSource(dict[key][value])
+            }
+        }
+        console.log(map.style.sourceCaches);
+        //Location updater fires query and update location every 10 seconds
+        timer=window.setInterval(async function() {
+            var c=0
+            await getlocation()
+            for(var key in dict){
+                for(var value in dict[key]){
+                    console.log(value,c,dict[key][value])
+                    console.log(map.style.sourceCaches);
+                    let p = new marker(dict[key][value],[lon[key][value],lat[key][value]]);
+                    map.getSource(dict[key][value]).setData(p);
+                }
+                c+=1
+            }               
+        },10000);
+    }
+
+    function selanimal(flag){
+        
+        console.log(timer)
+        if(timer)
+        clearInterval(timer)
+        var animal="all"
+        if(!flag){
+            console.log(document.getElementById("animal").value);
+            animal=document.getElementById("animal").value
+        }
+        if (animal!="all")
+        {
+            document.getElementById("aid").innerHTML="<select id='animal_id' onchange='selid("+'"'+animal+'"'+")'>"
+                +"<option disabled selected>Select Animal ID</option>"
+                +"<option value='all'>All</option>"
+                +"</select>"
+            for(var i in mdict[animal])
+            {
+                console.log(mdict[animal][i],i)
+                document.getElementById("animal_id").innerHTML+=("<option value='"+i.toString()+"'>"+mdict[animal][i].toString()+"</option>")
+            }
+            var tid=mdict[animal]
+            var tlat=mlat[animal]
+            var tlon=mlon[animal]
+            console.log(tid,tlat,tlon)
+            dict={}
+            lat={}
+            lon={}
+            dict[animal]=tid
+            lat[animal]=tlat
+            lon[animal]=tlon
+            console.log(dict)
+        }
+        else{
+            dict=mdict
+            lat=mlat
+            lon=mlon
+            console.log(dict,lat,lon)
+        }
+        showmap();
+    }
+
+    function selid(animal){
+        console.log(timer)
+        if(timer)
+        clearInterval(timer)
+        var id=document.getElementById('animal_id').value
+        if(id!='all'){
+            var tid=[mdict[animal][id]]
+            var tlat=[mlat[animal][id]]
+            var tlon=[mlon[animal][id]]
+            console.log(tid,tlat,tlon)
+            dict={}
+            lat={}
+            lon={}
+            dict[animal]=tid
+            lat[animal]=tlat
+            lon[animal]=tlon
+            console.log(dict)
+            console.log(document.getElementById('animal_id').value)
+        }
+        else{
+            var tid=mdict[animal]
+            var tlat=mlat[animal]
+            var tlon=mlon[animal]
+            console.log(tid,tlat,tlon)
+            dict={}
+            lat={}
+            lon={}
+            dict[animal]=tid
+            lat[animal]=tlat
+            lon[animal]=tlon
+            console.log(dict)
+        }
+        showmap();
+    }
+
+</script>
+
+</body>
+</html>

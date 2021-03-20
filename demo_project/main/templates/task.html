@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script src="https://js.pusher.com/6.0/pusher.min.js"></script>
+	  <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert-dev.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css">
+	  <script>
+	
+		// Enable pusher logging - don't include this in production
+		Pusher.logToConsole = true;
+	
+		var pusher = new Pusher('ed4d3bfd7a2e6650c539', {
+		  cluster: 'ap2'
+		});
+	
+		var channel = pusher.subscribe('my-channel');
+		channel.bind('my-event', function(data) {
+		  console.log(JSON.stringify(data));
+		  localStorage.setItem("lat",data['lat'])
+		  localStorage.setItem("lon",data['lon'])
+		  setTimeout(function () { 
+                    swal({
+                    title: "Alert!",
+                    text: data['message'],
+                    type: "warning",
+                    confirmButtonText: "OK",
+                    allowOutsideClick: true
+                    },
+                    function(isConfirm){
+                    if (isConfirm) {
+                        window.location.href = "{% url 'alertmap' %}";
+                    }
+                    }); }, 10);
+		});
+	  </script>
+</head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+<style type="text/css">
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
+  body{
+  background-image: url( {% static "wave.png" %} );
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  }
+ 	
+#example{
+    margin: 100px 30px 0px 30px;
+    box-shadow: 5px 10px 18px #888888;
+	border-radius:20px;
+}
+
+th,td{
+	border: 0px !important;
+}
+
+th{
+	font-size: 20px;
+	font-family: 'Abril Fatface', cursive;
+	color: #218c74;
+}
+
+td{
+	font-size: 18px;
+  border-radius: 20px;
+}
+
+.badge{
+	border-radius: 10px; 
+	padding: 7px;
+	width: auto;
+
+}
+
+ul {
+  list-style-type: none;
+  margin: 0 100px;
+  padding:7px 20px 0px 0px;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+li {
+  float: right;
+}
+
+li a {
+  display: block;
+  color:#3CB371 ;
+  text-align: center;
+  padding: 14px 25px;
+  text-decoration: none;
+  letter-spacing: 2px;
+}
+
+li a:hover {
+  color: #006400;
+  border-bottom: 0px solid #006400;
+}
+	
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> -->
+<script>
+  console.log("{{flag|safe}}")
+  function send(i,t){
+    console.log(i,t);
+    $.ajax({
+        type: "POST",
+        url: '{% url 'assigntask'%}',   
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+              task_id:t,
+              task_to:i},   /* Passing the text data */
+        success:  function(response){
+               alert(response);
+           }
+    });
+  }
+  function myvalue(i,j){
+    console.log(i);
+    console.log(j);
+    document.getElementById(j).value=i;
+  }
+</script>
+
+<body>
+  <ul>
+    <li><a href='{% url 'logout_server' %}'>Logout</a></li>
+    <li><a href="#about">Tab</a></li>
+    <li><a href="#contact">Tab</a></li>
+    <li><a href="#news">Tab</a></li>
+  </ul>
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+    <div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body container text-center">
+        <!-- <img src="data:image/png;base64," alt="" width="200" height="280" > -->
+        <img src="{% static 'pratik.jpg' %}" alt="" width="300" height="280" >
+        <h4>Description:</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</p>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    </div>
+    </div>
+    </div>
+
+  <div id="example" style="background-color: white;">
+ <table class="table">
+  <thead>
+    <tr>
+      <th scope="col" class="d-flex flex-column bd-highlight col-5">Task Info</th>
+      <th scope="col">Deadline</th>
+      <th scope="col">Status</th>
+      <th scope="col">Task_to</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in data%}
+    <tr data-value="{{ i.task_id }}" data-status="{{ i.status }}">
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">{{i.task_info}}</td>
+      <td><span class="badge badge-success" style="">{{i.deadline}}</span></td>
+      <td ><span class="badge badge-primary">{{i.status}}</span></td>
+      {% if i.status == "incomplete" %}
+      <td><select onchange="myvalue(this.value,'{{i.task_id}}')">
+        <option>None</option>
+        {% for j in workers %}
+          {% if flag == 'range_incharge' %}
+            <option value='{{j.area}}'>{{ j.area }}</option>
+          {% elif flag == 'beat_incharge' %}
+            <option value='{{ j.empid }}-{{j.name}}'>{{ j.empid }}-{{j.name}}</option>
+          {% endif %}
+        {% endfor %}
+      </select></td>
+      <td><button value="" id="{{i.task_id}}" onclick="send(this.value,'{{i.task_id}}')">Assign</button></td>
+      {% else %}
+      <td>{{i.task_to}}</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+	<!-- <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 2</td>
+      <td>Task 2</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 3</td>
+      <td>Task 3</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 4</td>
+      <td>Task 4</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>  
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 5</td>
+      <td>Task 5</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">Task 6</td>
+      <td>Task 6</td>
+      <td><span class="badge badge-success">High</span></td>
+      <td ><span class="badge badge-primary">Primary</span></td>
+    </tr>   -->
+
+  </tbody>
+</table>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+  var status=""
+  var value=""
+  $(document).ready(function(){
+    $(".table").on("click", "tbody tr", function(){
+      console.log("row clicked",$(this).data('value'),$(this).data('status'));
+      status=$(this).data('status')
+      value=$(this).data('value')
+      get_des()
+    });
+  });
+  
+  function get_des(){
+    console.log(status)
+    if(status=='complete'){
+      console.log("getting description")
+          $.ajax({
+          type: "POST",
+          url: '{% url 'task_description'%}',   
+          data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+                task_id:value,
+                },   /* Passing the text data */
+          success:  function(response){
+                // alert(response);
+                var data=JSON.parse(response);
+                console.log(data)
+                document.getElementById('mbody').innerHTML="<div> DESCRIPTION </div>"+
+                " <img src='data:image/png;base64,"+data['image']+" ' alt='Billy Adams'/>"
+            }
+          });
+          $("#exampleModal").modal("show");
+        }
+  }
+</script>
+
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+</body>
+</html>
