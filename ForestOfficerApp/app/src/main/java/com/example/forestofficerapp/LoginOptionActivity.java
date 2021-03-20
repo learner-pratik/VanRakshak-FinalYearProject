@@ -3,33 +3,55 @@ package com.example.forestofficerapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 public class LoginOptionActivity extends Activity {
 
+    private final String LOG_TAG = this.getClass().getSimpleName();
+    public static final String BASE_URL = "https://forestweb.herokuapp.com";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_loginoption);
 
-        Button registerButton = (Button) findViewById(R.id.registerButton);
-        Button loginButton = (Button) findViewById(R.id.loginButton);
+        Button registerButton = findViewById(R.id.registerButton);
+        Button loginButton = findViewById(R.id.loginButton);
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        String loginEmail = SaveSharedPreference.getEmail(this);
+        String loginPassword = SaveSharedPreference.getPassword(this);
+
+        Log.d(LOG_TAG, "Email is "+ loginEmail);
+        Log.d(LOG_TAG, "Password is "+ loginPassword);
+
+        if (!ForestService.isForestServiceRunning) {
+
+        }
+
+        if (!loginEmail.isEmpty() && !loginPassword.isEmpty()) {
+            Intent mainActivityIntent = new Intent(this, MainActivity.class);
+            startActivity(mainActivityIntent);
+        }
+
+        registerButton.setOnClickListener(v -> {
+            if (InternetConnection.checkInternetStatus(this)) {
                 Intent registerEmailActivityIntent = new Intent(LoginOptionActivity.this, RegisterEmailActivity.class);
                 startActivity(registerEmailActivityIntent);
+            } else {
+                Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
             }
         });
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        loginButton.setOnClickListener(v -> {
+            if (InternetConnection.checkInternetStatus(this)) {
                 Intent loginActivityIntent = new Intent(LoginOptionActivity.this, LoginActivity.class);
                 startActivity(loginActivityIntent);
+            } else {
+                Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
             }
         });
     }

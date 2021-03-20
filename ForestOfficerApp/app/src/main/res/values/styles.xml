@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="Theme.Vanrakshak" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+    </style>
+
+    <style name="Widget.Vanrakshak.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorAccent</item>
+        <item name="android:theme">@style/Theme.Vanrakshak</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Vanrakshak.Toolbar</item>
+    </style>
+
+    <style name="TextAppearance.Vanrakshak.Toolbar" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Widget.Vanrakshak.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="hintTextAppearance">@style/TextAppearance.Vanrakshak.TextInputLayout.HintText</item>
+        <item name="hintTextColor">@color/textColorPrimary</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="boxStrokeColor">@color/textInputOutlineColor</item>
+    </style>
+
+    <style name="Widget.Vanrakshak.MaterialCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="background">@color/colorAccent</item>
+        <item name="textAppearanceHeadline5">@color/colorPrimary</item>
+        <item name="textAppearanceSubtitle1">@color/colorPrimaryDark</item>
+        <item name="textAppearanceSubtitle2">@color/textColorPrimary</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Vanrakshak.Title" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.Vanrakshak.TextInputLayout.HintText" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="Widget.Vanrakshak.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="backgroundTint">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="Widget.Vanrakshak.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="Widget.Vanrakshak.Backdrop" parent="">
+        <item name="android:background">?attr/colorAccent</item>
+    </style>
+</resources>

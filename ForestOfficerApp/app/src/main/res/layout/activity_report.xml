@@ -1,48 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp" tools:context=".ReportActivity"
-    android:orientation="vertical"
-    android:gravity="center">
+    tools:context=".ReportActivity">
 
-
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Empty"
-        android:id="@+id/txt_bundle"
-        android:layout_marginTop="30dp"/>
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/report_description"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_marginTop="103dp"
-        android:inputType="text"/>
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:fitsSystemWindows="true">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="103dp"
-        android:id="@+id/take_picture"
-        android:text="CAMERA"/>
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppbar"
+                style="@style/Widget.Vanrakshak.Toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@drawable/ic_menu_24px"
+                app:logo="@drawable/logo_removebg_preview"
+                app:title="@string/forest_app_bar_name"
+                app:menu="@menu/appbar_menu" />
+        </com.google.android.material.appbar.AppBarLayout>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="103dp"
-        android:id="@+id/picture_taken" />
+        <TextView
+            android:id="@+id/txt_bundle"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="10dp"
+            android:text="Empty" />
 
-    <Button
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/report_name"
+            tyle="@style/Widget.Design.TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="10dp"
+            android:hint="@string/reportEditText_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/report_description"
+            style="@style/Widget.Vanrakshak.TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="10dp"
+            android:hint="@string/reportDescription_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:lines="4" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/picture_taken"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:background="@color/colorAccent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/take_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/cameraButton_name"/>
+
+        <ProgressBar
+            android:id="@+id/reportProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+
+        <TextView
+            android:id="@+id/reportProgressMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textSize="20sp"
+            android:layout_marginBottom="10dp"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            android:text="Submitting Report"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/submit_report"
+                style="@style/Widget.Vanrakshak.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:text="@string/submitButton_name"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_report"
+                style="@style/Widget.Vanrakshak.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancelButton_name"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="103dp"
-        android:id="@+id/submit_report"
-        android:text="SUBMIT"/>
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:itemIconSize="40dp"
+        app:itemIconPadding="30dp"
+        app:itemIconTint="@color/textColorPrimary"
+        app:itemHorizontalPadding="30dp"
+        app:itemTextColor="@color/textColorPrimary"
+        app:itemTextAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+        app:headerLayout="@layout/header_navigation_drawer"
+        app:menu="@menu/navigation_drawer"/>
 
-</LinearLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

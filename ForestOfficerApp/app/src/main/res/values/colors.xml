@@ -7,10 +7,16 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="colorAccent">#FF4081</color>
     <color name="yellow">#FFBB33</color>
     <color name="circlebackground1">#26F85B</color>
     <color name="circlebackground2">#71CEDA</color>
     <color name="circlebackground3">#FFE607</color>
     <color name="circlebackground4">#F11D1D</color>
+
+    <color name="colorPrimary">#00E676</color>
+    <color name="colorPrimaryDark">#00B248</color>
+    <color name="colorAccent">#66FFA6</color>
+    <color name="textColorPrimary">#003D00</color>
+    <color name="textInputOutlineColor">#00B248</color>
+    <color name="loginPageBackgroundColor">#FFFFFF</color>
 </resources>

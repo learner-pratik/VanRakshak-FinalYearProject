@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">SOSApp</string>
+    <string name="forest_app_bar_name">VANRAKSHAK</string>
+    <string name="registerButton_name">REGISTER</string>
+    <string name="submitButton_name">SUBMIT</string>
+    <string name="cancelButton_name">CANCEL</string>
+    <string name="registerPage_name">REGISTRATION DETAILS</string>
+    <string name="registerOption_name">OPTIONAL</string>
+    <string name="firstNameEditText_name">FIRST NAME</string>
+    <string name="lastNameEditText_name">LAST NAME</string>
+    <string name="registerUserName_name">NAME</string>
+    <string name="registerUserAddress_name">ADDRESS</string>
+    <string name="addressEditText_name">SETTLEMENT ADDRESS</string>
+    <string name="navigation_header_user_description">LOCAL VILLAGER</string>
+    <string name="navigation_profile_name">Profile</string>
+    <string name="navigation_report_name">Report</string>
+    <string name="navigation_sospage_name">SOS-Alert</string>
+    <string name="open">OPEN</string>
+    <string name="close">CLOSE</string>
+    <string name="profileUser_name">NAME</string>
+    <string name="userReports_name">Reports Submitted</string>
+    <string name="userAlerts_name">SOS-Alerts sent</string>
+    <string name="userPhoneNumber_name">Phone Number</string>
+    <string name="reportEditText_name">Report Name</string>
+    <string name="reportDescription_name">Description</string>
+    <string name="cameraButton_name">Click Picture</string>
+    <string name="reportType_name">Report Type</string>
+</resources>
