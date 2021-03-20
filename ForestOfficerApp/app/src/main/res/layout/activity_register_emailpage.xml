@@ -1,66 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight = "@dimen/activity_horizontal_margin"
-    android:paddingTop = "@dimen/activity_vertical_margin"
-    android:paddingBottom = "@dimen/activity_vertical_margin">
+    android:background="@color/loginPageBackgroundColor"
+    tools:context=".RegisterEmailActivity">
 
-    <TextView
-        android:text = "REGISTER"
-        android:layout_width="wrap_content"
-        android:layout_height = "wrap_content"
-        android:textSize = "35dp"
-        android:id = "@+id/registerTextView"
-        android:layout_alignParentTop = "true"
-        android:layout_centerHorizontal = "true" />
-
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text = "Enter your Email"
-        android:textSize="25dp"
-        android:id="@+id/registerEmailTextView"
-        android:layout_above="@id/registerEmailEditText"
-        android:layout_marginBottom="15dp"
-        android:layout_alignParentLeft = "true"
-        android:layout_alignParentStart = "true"
-        android:layout_alignParentRight = "true"
-        android:layout_alignParentEnd = "true" />
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <EditText
-        android:layout_width = "wrap_content"
-        android:layout_height = "wrap_content"
-        android:id = "@+id/registerEmailEditText"
-        android:hint = "EMAIL"
-        android:focusable = "true"
-        android:textColorHighlight = "#ff7eff15"
-        android:textColorHint = "#ffff25e6"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft = "true"
-        android:layout_alignParentStart = "true"
-        android:layout_alignRight="@id/registerEmailTextView"
-        android:layout_alignEnd="@id/registerEmailTextView" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/logo"
+            android:backgroundTint="@color/colorPrimary"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/submitButton_name"
-        android:id="@+id/registerEmailSubmit"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/registerTextView"
-        android:layout_toStartOf="@+id/registerTextView" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:text="@string/forest_app_bar_name"
+            android:textAppearance="@style/TextAppearance.Vanrakshak.Title"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/cancelButton_name"
-        android:id="@+id/registerCancel"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/registerTextView"
-        android:layout_toEndOf="@+id/registerTextView" />
+        <TextView
+            android:id = "@+id/registerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:text="@string/registerButton_name"
+            android:textSize="30sp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
 
-</RelativeLayout>
+        <ProgressBar
+            android:id="@+id/emailProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/otpTextMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="SENDING OTP"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="20sp"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/registerEmailEditText"
+            style="@style/Widget.Vanrakshak.TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:hint="Email">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/registerEmailSubmit"
+                style="@style/Widget.Vanrakshak.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:text="@string/submitButton_name"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/registerCancel"
+                style="@style/Widget.Vanrakshak.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_toStartOf="@id/registerEmailSubmit"
+                android:layout_toLeftOf="@id/registerEmailSubmit"
+                android:text="@string/cancelButton_name"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+</ScrollView>

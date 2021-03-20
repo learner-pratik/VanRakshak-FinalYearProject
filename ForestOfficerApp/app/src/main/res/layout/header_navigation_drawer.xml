@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    style="@style/Widget.Vanrakshak.Toolbar">
+        
+    <ImageView
+        android:id="@+id/personImage"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/logo_removebg_preview" />
+
+    <TextView
+        android:id="@+id/personName"
+        style="@style/Widget.Vanrakshak.TextInputLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pratik Naik"
+        android:layout_marginLeft="20dp"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/personDesignation"
+        style="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Beat Officer"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="15dp"
+        android:textSize="25sp" />
+</LinearLayout>
+

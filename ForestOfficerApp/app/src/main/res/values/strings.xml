@@ -1,10 +1,27 @@
 <resources>
     <string name="app_name">ForestOfficerApp</string>
+    <string name="email_name">EMAIL</string>
+    <string name="demoEmail_name">something@example.com</string>
     <string name="registerButton_name">REGISTER</string>
+    <string name="enterOtp_message">Enter OTP sent to your email</string>
+    <string name="newPassword_name">New Password</string>
+    <string name="confirmPassword_name">Confirm Password</string>
     <string name="loginButton_name">LOGIN</string>
     <string name="submitButton_name">SUBMIT</string>
     <string name="cancelButton_name">CANCEL</string>
+    <string name="forgotPassword_name">FORGOT PASSWORD</string>
     <string name="registrationPage_name">REGISTER</string>
+    <string name="welcomePage_name">WELCOME</string>
+    <string name="taskReport_name">Task Report</string>
+    <string name="cameraButton_name">TAKE A PICTURE</string>
+    <string name="reportEditText_name">Report Name</string>
+    <string name="reportDescription_name">Description</string>
+    <string name="profileDesignation_name">DESIGNATION</string>
+    <string name="profileBeat_name">BEAT</string>
+    <string name="profileRange_name">RANGE</string>
+    <string name="profileDivision_name">DIVISION</string>
+    <string name="profileTask_name">Task Completed</string>
+    <string name="profileReport_name">Report Submitted</string>
     <string name="password_specifications">
         Password must satisfy following constraints\n
         \t \u2022 Minimum length - 8 characters\n
@@ -14,4 +31,14 @@
         \t \u2022 Must contain at least one digit\n
         \t \u2022 Must contain at least one special character (@$&amp;#)\n
     </string>
+
+    <string name="navigation_alert_name">Alerts</string>
+    <string name="navigation_map_name">Animals</string>
+    <string name="navigation_profile_name">Profile</string>
+    <string name="navigation_report_name">Report</string>
+    <string name="navigation_task_name">Task</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+
+    <string name="forest_app_bar_name">VANRAKSHAK</string>
 </resources>

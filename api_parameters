@@ -1,0 +1,79 @@
+1. check Email registration
+url - "/check"
+request - {
+	"email" : "<emailid>"
+}
+response - {
+	"email" : "1,2,3" // 1 for email incorrect, 
+			  //  2 for password already registered for email
+			  //  3 for correct email address
+}
+
+2. save password
+url - "/register"
+request - {
+	"email" : "<emailid>",
+	"password" : "<password>"
+}
+response - {
+	"status" : "true/false(boolean)"
+}
+
+3. login 
+url - "/login"
+request - {
+	"email" : "<emailid>",
+	"password" : "<password>"
+}
+response - {
+	"email" : "true/false(boolean)"
+	"password" : "true/false(boolean)"
+	"password_registration" : "true/false(boolean)" // whether password is present in DB
+	// if credentials are wrong then user will be null
+	"user" : {
+		"name" : "<officer_name>",
+		"designation" : "<designation_name>",
+		"beat" : "<beat_name>",
+		"range" : "<range_name>",
+		"division" : "<division_name>"
+	} 
+}
+
+4. report
+url - "/report"
+request - {
+	"email" : "<email_id>",
+	"name" : "<report_name>",
+	"type" : "<report_type>",
+	"description" : "<report_description>",
+	"latitude" : "<latitude>",
+	"longitude" : "<longitude>",
+}
+response - {
+	"status" : "true/false(boolean)"
+}
+
+5. taskreport
+url - "/taskreport"
+request - {
+	"email" : "<email_id>",
+	"taskID" : "<task_id>",
+	"report" : "<task_report>",
+	"latitude" : "<latitude>",
+	"longitude" : "<longitude>",
+}
+response - {
+	"status" : "true/false(boolean)"
+}
+
+6. alert 
+url - "/alert"
+request - {
+	"alert" : "true"
+}
+response - {
+	"name" : "<alert_name>",
+	"type" : "true/false(boolean)", // true for camera-alerts, false for sos-alerts
+	"latitude" : "<latitude>",
+	"longitude" : "<longitude>"
+}

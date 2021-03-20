@@ -10,36 +10,35 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.Random;
 
 public class RegisterOtpActivity extends Activity {
 
-    EditText otpText;
-    boolean emailSent;
+    TextInputLayout otpText;
     String sentOtp, registeredEmail;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register_otppage);
 
         otpText = findViewById(R.id.registerOtpEditText);
 
-        Button otpSubmitButton = findViewById(R.id.registerOtpSubmit);
-        Button cancelButton = findViewById(R.id.registerCancel);
+        MaterialButton otpSubmitButton = findViewById(R.id.registerOtpSubmit);
+        MaterialButton cancelButton = findViewById(R.id.registerCancel);
 
         TextView registeredEmailTextView = findViewById(R.id.registeredEmail);
         registeredEmail = getIntent().getStringExtra("Email");
         registeredEmailTextView.setText(registeredEmail);
-        emailSent = getIntent().getBooleanExtra("Email-Sent", false);
         sentOtp = getIntent().getStringExtra("Generated-OTP");
 
         Intent previousActivity = new Intent(RegisterOtpActivity.this, LoginOptionActivity.class);
 
         otpSubmitButton.setOnClickListener(v -> {
-            if (!emailSent) {
-                Toast.makeText(RegisterOtpActivity.this, "Unable to send OTP, check internet connection", Toast.LENGTH_SHORT).show();
-            }
-            else if (VerifyOtp()) {
+            if (VerifyOtp()) {
                 Intent passwordActivityIntent = new Intent(RegisterOtpActivity.this, RegisterPasswordActivity.class);
                 passwordActivityIntent.putExtra("Email", registeredEmail);
                 startActivity(passwordActivityIntent);
@@ -55,7 +54,7 @@ public class RegisterOtpActivity extends Activity {
     }
 
     private boolean VerifyOtp() {
-        String enteredOtp = otpText.getText().toString();
+        String enteredOtp = otpText.getEditText().getText().toString();
         if (enteredOtp.equals(sentOtp))
             return true;
         else

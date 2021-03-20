@@ -6,8 +6,10 @@ public class Task {
 
     private String taskType, taskName, taskDescription, assignedBy;
     private Date taskDeadline;
+    private int taskID;
     
-    public Task (String taskType, String taskName, String taskDescription, String assignedBy, Date taskDeadline) {
+    public Task (int taskID, String taskType, String taskName, String taskDescription, String assignedBy, Date taskDeadline) {
+        this.taskID = taskID;
         this.taskType = taskType;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
@@ -37,6 +39,14 @@ public class Task {
 
     public void setTaskDescription(String taskDescription) {
         this.taskDescription = taskDescription;
+    }
+
+    public int getTaskID() {
+        return taskID;
+    }
+
+    public void setTaskID(int taskID) {
+        this.taskID = taskID;
     }
 
     public String getAssignedBy() {
