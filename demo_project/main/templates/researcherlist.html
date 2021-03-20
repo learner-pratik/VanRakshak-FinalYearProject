@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<style type="text/css">
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
+  body{
+  background-image: url( {% static "wave.png" %} );
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  }
+ 	
+#example{
+    margin: 100px 30px 0px 30px;
+    box-shadow: 5px 10px 18px #888888;
+	border-radius:20px;
+}
+
+th,td{
+	border: 0px !important;
+}
+
+th{
+	font-size: 20px;
+	font-family: 'Abril Fatface', cursive;
+	color: #218c74;
+}
+
+td{
+	font-size: 18px;
+  border-radius: 20px;
+}
+
+.badge{
+	border-radius: 10px; 
+	padding: 7px;
+	width: auto;
+
+}
+
+ul {
+  list-style-type: none;
+  margin: 0 100px;
+  padding:7px 20px 0px 0px;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+li {
+  float: right;
+}
+
+li a {
+  display: block;
+  color:#3CB371 ;
+  text-align: center;
+  padding: 14px 25px;
+  text-decoration: none;
+  letter-spacing: 2px;
+}
+
+li a:hover {
+  color: #006400;
+  border-bottom: 0px solid #006400;
+}
+	
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <ul>
+    <!-- <li><a href="#about">Tab</a></li>
+    <li><a href="#contact">Tab</a></li>
+    <li><a href="#news">Tab</a></li> -->
+    <li><a href='{% url 'login' %}'>Logout</a></li>
+  </ul>
+  <div id="example" style="background-color: white;">
+ <table class="table">
+  <thead>
+    <tr>
+      <th scope="col" class="d-flex flex-column bd-highlight col-5">Name</th>
+      <th scope="col">Experience</th>
+      <th scope="col">Qualification</th>
+      <th scope="col">Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in data %}
+    <tr>
+      <td scope="row" class="d-flex flex-column bd-highlight col-5">{{i.researcher_name}}</td>
+      <td>{{i.experience}}</td>
+      <td>{{ i.qualification }}</td>
+      <td><button onclick="edit('{{ i.researcher_id }}')">Edit</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+<script>
+  function edit(id){
+    console.log("edit clicked",id)
+    window.location.href="./editresearcher/"+id
+    // $.ajax({
+    //   type: "POST",
+    //   url:
+    //   dataType:'json', 
+    //   data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+    //         id:id}
+    // })
+  }
+</script>
+</body>
+</html>

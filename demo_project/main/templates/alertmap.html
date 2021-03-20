@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Add live realtime data</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; } 
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+    //Access token
+	mapboxgl.accessToken = 'pk.eyJ1Ijoib21rYXIyMSIsImEiOiJjanRxc3hoamcwZDNtNGRxZGNnaXF2ZHU3In0.Ovq0lb6DSdnLkIMMb32UPA';
+
+    //Load MAp
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [73.5,21.5], // starting position [lng, lat]
+        zoom: 7 // starting zoom
+    });
+
+    //Icon set
+    const images =['https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Google_Maps_pin.svg/585px-Google_Maps_pin.svg.png','https://image.flaticon.com/icons/png/512/37/37134.png'];
+
+    //Defining structure of GeoJSON object of all markers
+    //    "data": {
+    //    "type": "Feature",
+    //    "geometry": {
+    //        "type": "Point",
+    //        "coordinates": [-77.0323, 38.9131]
+    //      },
+    //    "properties": {
+    //        "title": "Mapbox DC",
+    //        "marker-symbol": "monument"
+    //      }
+    //  }
+
+    function marker(id,coordinates){ 
+    this.type = "Feature"; 
+    this.geometry = {"type":"Point","coordinates":coordinates};
+    this.properties = {"title":id};
+    } 
+
+    function loadImage(key,c){
+        return new Promise(resolve => {
+            setTimeout(() => {
+                map.loadImage(images[c], function(error, res) {
+                console.log(key,c)
+                map.addImage(key, res)
+            });
+            resolve("done");
+            }, 2000);
+        });
+    }
+
+    map.on('load',async function() {
+
+        //Marker Initialization
+        var lat=parseFloat(localStorage.getItem('lat'))
+        var lon=parseFloat(localStorage.getItem('lon'))
+        var c = 0;
+        var key="alert"
+        var s=await loadImage(key,c);
+        let pin  = new marker("alert",[lon,lat]); 
+            map.addSource("alert", { type: 'geojson', data: pin });
+            map.addLayer({
+            'id': "alert",
+            'type': 'symbol',
+            'source': "alert",
+            'layout': {
+                'icon-image': key,
+                'icon-size': 0.05
+                }
+            });
+        
+    })
+</script>
+
+</body>
+</html>
