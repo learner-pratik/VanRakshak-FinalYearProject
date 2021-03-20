@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +23,10 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
@@ -34,6 +39,9 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 
 public class TaskActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private final String LOG_TAG = this.getClass().getSimpleName();
+    private static final String taskURL = "/new_taskreport";
 
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
@@ -105,10 +113,55 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void sendTaskReport() {
-        String reportData = taskReport.getEditText().getText().toString();
 
-        TaskAsyncTask taskAsyncTask = new TaskAsyncTask(this);
-        taskAsyncTask.execute(reportData);
+        progressBar.setVisibility(View.VISIBLE);
+        progressMessage.setVisibility(View.VISIBLE);
+
+        String url = LoginOptionActivity.BASE_URL+taskURL;
+        String reportData = taskReport.getEditText().getText().toString();
+        String geoLatitude = String.valueOf(MainActivity.currentLocation.getLatitude());
+        String geoLongitude = String.valueOf(MainActivity.currentLocation.getLongitude());
+
+        JSONObject jsonObject = new JSONObject();
+        String taskID = String.valueOf(this.task.getTaskID());
+        try {
+            jsonObject.put("email", SaveSharedPreference.getEmail(this));
+            jsonObject.put("taskID", taskID);
+            jsonObject.put("report", reportData);
+            jsonObject.put("latitude", geoLatitude);
+            jsonObject.put("longitude", geoLongitude);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, jsonObject, response -> {
+
+            boolean status = false;
+            try {
+                status = response.getBoolean("status");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            progressBar.setVisibility(View.INVISIBLE);
+            if (status) {
+                refreshTaskPage();
+            } else {
+                progressMessage.setText("FAILED TO SEND REPORT");
+                Handler handler = new Handler();
+                handler.postDelayed(() -> {
+                    progressMessage.setVisibility(View.INVISIBLE);
+                    goToTaskList();
+                }, 1000);
+            }
+        }, error -> {
+            Log.d(LOG_TAG, "post request failed");
+            error.printStackTrace();
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 
     @Override
@@ -185,80 +238,6 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     private void setNavigationViewListener() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
         navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    private class TaskAsyncTask extends AsyncTask<String, Void, Boolean> {
-
-        private WeakReference<TaskActivity> taskActivityWeakReference;
-
-        public TaskAsyncTask(TaskActivity taskActivity) {
-            super();
-            taskActivityWeakReference = new WeakReference<>(taskActivity);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            TaskActivity taskActivity = taskActivityWeakReference.get();
-            if (taskActivity == null || taskActivity.isFinishing())
-                return;
-
-            taskActivity.progressBar.setVisibility(View.VISIBLE);
-            taskActivity.progressMessage.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-
-//            JSONObject jsonObject = new JSONObject();
-//            String taskID = String.valueOf(taskActivityWeakReference.get().task.getTaskID());
-//            try {
-//                jsonObject.put("email", SaveSharedPreference.getEmail(taskActivityWeakReference.get()));
-//                jsonObject.put("taskID", taskID);
-//                jsonObject.put("report", strings[0]);
-//                jsonObject.put("latitude", strings[1]);
-//                jsonObject.put("longitude", strings[2]);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            SendData sendData = new SendData();
-//            JSONObject receivedData = (JSONObject) sendData.sendJsonData(
-//                    taskActivityWeakReference.get(), jsonObject, "Task");
-//            try {
-//                return receivedData.getBoolean("status");
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            TaskActivity taskActivity = taskActivityWeakReference.get();
-            if (taskActivity == null || taskActivity.isFinishing())
-                return;
-
-            taskActivity.progressBar.setVisibility(View.INVISIBLE);
-            if (aBoolean) {
-                taskActivity.refreshTaskPage();
-            } else {
-                taskActivity.progressMessage.setText("FAILED TO SEND REPORT");
-                Handler handler = new Handler();
-                handler.postDelayed(() -> {
-                    taskActivity.progressMessage.setVisibility(View.INVISIBLE);
-                    taskActivity.goToTaskList();
-                }, 1000);
-            }
-        }
     }
 
     private void refreshTaskPage() {

@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 public class LoginOptionActivity extends Activity {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
+    public static final String BASE_URL = "https://forestweb.herokuapp.com";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,19 +28,31 @@ public class LoginOptionActivity extends Activity {
         Log.d(LOG_TAG, "Email is "+ loginEmail);
         Log.d(LOG_TAG, "Password is "+ loginPassword);
 
+        if (!ForestService.isForestServiceRunning) {
+
+        }
+
         if (!loginEmail.isEmpty() && !loginPassword.isEmpty()) {
             Intent mainActivityIntent = new Intent(this, MainActivity.class);
             startActivity(mainActivityIntent);
         }
 
         registerButton.setOnClickListener(v -> {
-            Intent registerEmailActivityIntent = new Intent(LoginOptionActivity.this, RegisterEmailActivity.class);
-            startActivity(registerEmailActivityIntent);
+            if (InternetConnection.checkInternetStatus(this)) {
+                Intent registerEmailActivityIntent = new Intent(LoginOptionActivity.this, RegisterEmailActivity.class);
+                startActivity(registerEmailActivityIntent);
+            } else {
+                Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
+            }
         });
 
         loginButton.setOnClickListener(v -> {
-            Intent loginActivityIntent = new Intent(LoginOptionActivity.this, LoginActivity.class);
-            startActivity(loginActivityIntent);
+            if (InternetConnection.checkInternetStatus(this)) {
+                Intent loginActivityIntent = new Intent(LoginOptionActivity.this, LoginActivity.class);
+                startActivity(loginActivityIntent);
+            } else {
+                Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

@@ -17,15 +17,11 @@ import java.net.URL;
 
 public class InternetConnection {
 
-    private final String LOG_TAG = InternetConnection.this.getClass().getSimpleName();
-    private Context context;
-    private boolean internetStatus;
+    private static final String LOG_TAG = "InternetConnection";
+    private static Context context;
+    private static boolean internetStatus = false;
 
-    public InternetConnection(Context context) {
-        this.context = context;
-    }
-
-    private void isInternetPresentOnNetwork() {
+    private static void isInternetPresentOnNetwork() {
         try {
             HttpURLConnection urlc = (HttpURLConnection)
                     (new URL("https://clients3.google.com/generate_204")
@@ -42,19 +38,21 @@ public class InternetConnection {
         }
     }
 
-    private boolean isNetworkAvailable() {
+    private static boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null;
     }
 
-    public boolean checkInternetStatus(@Nullable Intent intent) {
-        if (isNetworkAvailable()) {
-            isInternetPresentOnNetwork();
-        } else {
-            internetStatus = false;
-        }
-        return internetStatus;
+    public static boolean checkInternetStatus(Context appContext) {
+//        context = appContext;
+//        if (isNetworkAvailable()) {
+//            isInternetPresentOnNetwork();
+//        } else {
+//            internetStatus = false;
+//        }
+//        return internetStatus;
+        return true;
     }
 }

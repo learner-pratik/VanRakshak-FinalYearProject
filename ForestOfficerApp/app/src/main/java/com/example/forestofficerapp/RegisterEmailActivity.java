@@ -17,6 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -38,9 +42,10 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-public class RegisterEmailActivity extends Activity {
+  public class RegisterEmailActivity extends Activity {
 
     private final String LOG_TAG = RegisterEmailActivity.this.getClass().getSimpleName();
+    private static final String emailURL = "/new_check";
     private TextInputLayout emailText;
     private ProgressBar emailProgressBar;
     private TextView otpTextView;
@@ -72,8 +77,80 @@ public class RegisterEmailActivity extends Activity {
     }
 
     private void verifyMailAndSendOTP() {
-        EmailAsyncTask emailAsyncTask = new EmailAsyncTask(this);
-        emailAsyncTask.execute(emailText.getEditText().getText().toString());
+//        EmailAsyncTask emailAsyncTask = new EmailAsyncTask(this);
+//        emailAsyncTask.execute(emailText.getEditText().getText().toString());
+
+        emailProgressBar.setVisibility(View.VISIBLE);
+        otpTextView.setVisibility(View.VISIBLE);
+        otpTextView.setText("VERIFYING EMAIL");
+
+        String url = LoginOptionActivity.BASE_URL+emailURL;
+        String email = emailText.getEditText().getText().toString();
+
+        JSONObject postData = new JSONObject();
+        try {
+            postData.put("email", email);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, postData, response -> {
+            Log.d(LOG_TAG, "post request success");
+            Log.d(LOG_TAG, response.toString());
+
+            int emailStatus = 0;
+            try {
+                emailStatus = response.getInt("email");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            emailProgressBar.setVisibility(View.INVISIBLE);
+            switch (emailStatus) {
+                case 1: {
+                    otpTextView.setText("EMAIL INCORRECT");
+                    Toast.makeText(this, "Please enter the registered email", Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case 2: {
+                    if (!checkWhetherRedirectedFromForgetPasswordOption()) {
+                        otpTextView.setText("PASSWORD ALREADY CREATED FOR THE EMAIL");
+                        Toast.makeText(this, "Redirecting you to the login page", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+                }
+                case 3: {
+                    otpTextView.setText("EMAIL VERIFIED");
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            Handler handler = new Handler();
+            int finalEmailStatus = emailStatus;
+            handler.postDelayed(() -> {
+
+                if (finalEmailStatus == 2) {
+                    goToLoginPage();
+                }
+                else if (finalEmailStatus == 3 || checkWhetherRedirectedFromForgetPasswordOption()) {
+                    String generatedOtp = getOTP();
+                    OtpAsyncTask otpAsyncTask = new OtpAsyncTask(this);
+                    otpAsyncTask.execute(email, generatedOtp);
+                }
+            }, 3000);
+
+        }, error -> {
+            System.out.println("post request failure");
+            error.printStackTrace();
+            goToOptionsPage();
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
+
     }
 
     private boolean checkInternetConnection(RegisterEmailActivity registerEmailActivity) {
@@ -125,110 +202,8 @@ public class RegisterEmailActivity extends Activity {
         return redirectedForForgotPassword;
     }
 
-    private static class EmailAsyncTask extends AsyncTask<String, Void, Integer> {
-
-        private WeakReference<RegisterEmailActivity> activityWeakReference;
-        private String submittedMail;
-
-        public EmailAsyncTask(RegisterEmailActivity emailActivity) {
-            super();
-            activityWeakReference = new WeakReference<>(emailActivity);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            RegisterEmailActivity emailActivity = activityWeakReference.get();
-            if (emailActivity == null || emailActivity.isFinishing()) {
-                return;
-            }
-            System.out.println("preexecute methood of emailasynctask called");
-
-            emailActivity.emailProgressBar.setVisibility(View.VISIBLE);
-            emailActivity.otpTextView.setVisibility(View.VISIBLE);
-            emailActivity.otpTextView.setText("VERIFYING EMAIL");
-
-        }
-
-        @Override
-        protected Integer doInBackground(String... strings) {
-
-            submittedMail = strings[0];
-            JSONObject postData = new JSONObject();
-            int response = 0;
-            try {
-                postData.put("email", strings[0]);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            SendData sendData = new SendData();
-            JSONObject receivedData = (JSONObject) sendData.sendJsonData(activityWeakReference.get(), postData, "Email");
-
-            try {
-                response = receivedData.getInt("email");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return response;
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//            return 1;
-        }
-
-        @Override
-        protected void onPostExecute(Integer emailStatus) {
-            super.onPostExecute(emailStatus);
-
-            RegisterEmailActivity emailActivity = activityWeakReference.get();
-            if (emailActivity == null || emailActivity.isFinishing()) {
-                return;
-            }
-
-            emailActivity.emailProgressBar.setVisibility(View.INVISIBLE);
-            switch (emailStatus) {
-                case 1:
-                    emailActivity.otpTextView.setText("EMAIL INCORRECT");
-                    Toast.makeText(emailActivity, "Please enter the registered email", Toast.LENGTH_LONG).show();
-                    break;
-                case 2:
-                    if (!emailActivity.checkWhetherRedirectedFromForgetPasswordOption()) {
-                        emailActivity.otpTextView.setText("PASSWORD ALREADY CREATED FOR THE EMAIL");
-                        Toast.makeText(emailActivity, "Redirecting you to the login page", Toast.LENGTH_LONG).show();
-                    }
-                    break;
-                case 3:
-                    emailActivity.otpTextView.setText("EMAIL VERIFIED");
-                    break;
-                default:
-                    break;
-            }
-
-            Handler handler = new Handler();
-            handler.postDelayed(() -> {
-
-                if (emailStatus == 2) {
-                    emailActivity.goToLoginPage();
-                }
-                else if (emailStatus == 3 || emailActivity.checkWhetherRedirectedFromForgetPasswordOption()) {
-                    String generatedOtp = emailActivity.getOTP();
-                    OtpAsyncTask otpAsyncTask = new OtpAsyncTask(emailActivity);
-                    otpAsyncTask.execute(submittedMail, generatedOtp);
-                }
-            }, 1000);
-
-        }
-    }
-
     private static class OtpAsyncTask extends AsyncTask<String, Void, Boolean> {
 
-//        private boolean check = false;
         private static final String username = "pratiknaik4799@gmail.com";
         private static final String password = "uzumakinaruto@4799";
         private String registeredEmail, generatedOtp;
@@ -256,7 +231,7 @@ public class RegisterEmailActivity extends Activity {
 
         @Override
         protected Boolean doInBackground(String... strings) {
-            boolean check = false;
+            Boolean check = false;
             registeredEmail = strings[0];
             generatedOtp = strings[1];
 

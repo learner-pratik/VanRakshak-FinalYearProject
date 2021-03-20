@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -51,6 +52,9 @@ import org.json.JSONObject;
 import java.lang.ref.WeakReference;
 
 public class ReportActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private final String LOG_TAG = this.getClass().getSimpleName();
+    private static final String reportURL = "/new_report";
 
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
@@ -127,25 +131,58 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
     }
 
     private void sendReport() {
+
+        String geoLatitude = String.valueOf(MainActivity.currentLocation.getLatitude());
+        String geoLongitude = String.valueOf(MainActivity.currentLocation.getLongitude());
         String name = reportName.getEditText().getText().toString();
         String description = reportDescription.getEditText().getText().toString();
+        String url = LoginOptionActivity.BASE_URL+reportURL;
 
-        final boolean[] success = new boolean[1];
-        final Double[] latitude = new Double[1];
-        final Double[] longitude = new Double[1];
+        progressBar.setVisibility(View.VISIBLE);
+        progressMessage.setVisibility(View.VISIBLE);
 
-        if (MainActivity.location_access == true) {
-
-            System.out.println("printing gecoordinates");
-            System.out.println(latitude[0]);
-            System.out.println(longitude[0]);
+        JSONObject postData = new JSONObject();
+        try {
+            postData.put("email", SaveSharedPreference.getEmail(this));
+            postData.put("name", name);
+            postData.put("type", reportType);
+            postData.put("description", description);
+            postData.put("latitude", geoLatitude);
+            postData.put("longitude", geoLongitude);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        String geoLatitude = String.valueOf(latitude[0]);
-        String geoLongitude = String.valueOf(longitude[0]);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, postData, response -> {
 
-        ReportAsyncTask reportAsyncTask = new ReportAsyncTask(this);
-        reportAsyncTask.execute(name, reportType, description, geoLatitude, geoLongitude);
+            boolean status = false;
+            try {
+               status  = response.getBoolean("status");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            progressBar.setVisibility(View.INVISIBLE);
+            if (status) {
+                progressMessage.setText("REPORT SENT");
+            } else {
+                progressMessage.setText("UNABLE TO SEND REPORT");
+            }
+
+            Handler handler = new Handler();
+            handler.postDelayed(() -> {
+                progressMessage.setVisibility(View.INVISIBLE);
+                startMainActivity();
+            }, 2000);
+
+        }, error -> {
+            Log.d(LOG_TAG, "post request failed");
+            error.printStackTrace();
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 
     @Override
@@ -221,81 +258,6 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
-        }
-    }
-
-    private static class ReportAsyncTask extends AsyncTask<String, Void, Boolean> {
-
-        private WeakReference<ReportActivity> reportActivityWeakReference;
-
-        public ReportAsyncTask(ReportActivity reportActivity) {
-            super();
-            reportActivityWeakReference = new WeakReference<>(reportActivity);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            ReportActivity reportActivity = reportActivityWeakReference.get();
-            if (reportActivity == null || reportActivity.isFinishing())
-                return;
-
-            reportActivity.progressBar.setVisibility(View.VISIBLE);
-            reportActivity.progressMessage.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-
-//            JSONObject postData = new JSONObject();
-//            try {
-//                postData.put("email", SaveSharedPreference.getEmail(reportActivityWeakReference.get()));
-//                postData.put("name", strings[0]);
-//                postData.put("type", strings[1]);
-//                postData.put("description", strings[2]);
-//                postData.put("latitude", strings[3]);
-//                postData.put("longitude", strings[4]);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//            SendData sendData = new SendData();
-//            JSONObject receivedData = (JSONObject) sendData.sendJsonData(
-//                    reportActivityWeakReference.get(), postData, "Report");
-//
-//            try {
-//                return receivedData.getBoolean("status");
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            ReportActivity reportActivity = reportActivityWeakReference.get();
-            if (reportActivity == null || reportActivity.isFinishing())
-                return;
-
-            reportActivity.progressBar.setVisibility(View.INVISIBLE);
-            if (aBoolean) {
-                reportActivity.progressMessage.setText("REPORT SENT");
-            } else {
-                reportActivity.progressMessage.setText("UNABLE TO SEND REPORT");
-            }
-
-            Handler handler = new Handler();
-            handler.postDelayed(() -> {
-                reportActivity.progressMessage.setVisibility(View.INVISIBLE);
-                reportActivity.startMainActivity();
-            }, 1000);
         }
     }
 }

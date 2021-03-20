@@ -33,6 +33,8 @@ import java.lang.ref.WeakReference;
 public class LoginActivity extends Activity {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
+    private static final String loginURL = "/new_login";
+
     private TextInputLayout emailText, passwordText;
     private ProgressBar loginProgressBar;
     private TextView loginTextView;
@@ -86,122 +88,76 @@ public class LoginActivity extends Activity {
 
     private boolean checkInternetConnection(LoginActivity loginActivity) {
         
-        InternetConnection connection = new InternetConnection(this);
+//        InternetConnection connection = new InternetConnection(this);
         return true;
     }
 
     private void checkLoginCredentials() {
+
+        loginProgressBar.setVisibility(View.VISIBLE);
+        loginTextView.setVisibility(View.VISIBLE);
+
+        String url = LoginOptionActivity.BASE_URL+loginURL;
         String email = emailText.getEditText().getText().toString();
         String password = passwordText.getEditText().getText().toString();
-        Log.d(LOG_TAG, "Entered email is "+email);
-        Log.d(LOG_TAG, "Entered password is "+password);
 
-        UserCredentialsAsyncTask credentialsAsyncTask = new UserCredentialsAsyncTask(this);
-        credentialsAsyncTask.execute(email, password);
-    }
-
-    private static class UserCredentialsAsyncTask extends AsyncTask<String, Boolean, Integer> {
-
-        private WeakReference<LoginActivity> loginActivityWeakReference;
-        private String registeredEmail, registeredPassword;
-        private JSONObject userProfile;
-        private String profileName, profileEmail, profileDesignation, profileBeat, profileRange, profileDivision;
-
-        public UserCredentialsAsyncTask(LoginActivity loginActivity) {
-            super();
-            loginActivityWeakReference = new WeakReference<>(loginActivity);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("email", email);
+            jsonObject.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, jsonObject, response -> {
 
-            LoginActivity loginActivity = loginActivityWeakReference.get();
-            if (loginActivity == null || loginActivity.isFinishing())
-                return;
-
-            loginActivity.loginProgressBar.setVisibility(View.VISIBLE);
-            loginActivity.loginTextView.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Integer doInBackground(String... strings) {
-
-            registeredEmail = strings[0];
-            registeredPassword = strings[1];
-
-            JSONObject jsonObject = new JSONObject();
+            boolean verifiedEmail = false, verifiedPassword = false, passwordRegistered = false;
             try {
-                jsonObject.put("email", registeredEmail);
-                jsonObject.put("password", registeredPassword);
+                verifiedEmail = response.getBoolean("email");
+                verifiedPassword = response.getBoolean("password");
+                passwordRegistered = response.getBoolean("password_registration");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            SendData sendData = new SendData();
-            JSONObject receivedData = (JSONObject) sendData.sendJsonData(loginActivityWeakReference.get(), jsonObject, "Login");
-
-            Boolean verifiedEmail = false, verifiedPassword = false, passwordRegistered = false;
-            try {
-                verifiedEmail = receivedData.getBoolean("email");
-                verifiedPassword = receivedData.getBoolean("password");
-                passwordRegistered = receivedData.getBoolean("password_registration");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
+            int option = 0;
+            JSONObject userProfile = new JSONObject();
             if (!verifiedEmail) {
-                return 1;
+                option = 1;
             } else if (!verifiedPassword && passwordRegistered) {
-                return 2;
+                option = 2;
             } else if (!passwordRegistered) {
-                return 3;
+                option = 3;
             } else if (verifiedEmail && verifiedPassword) {
                 try {
-                    userProfile = receivedData.getJSONObject("user");
+                    userProfile = response.getJSONObject("user");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                return 4;
+                option = 4;
             }
-            return 0;
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//            return 4;
-        }
 
-        @Override
-        protected void onPostExecute(Integer option) {
-            super.onPostExecute(option);
-
-            LoginActivity loginActivity = loginActivityWeakReference.get();
-            if (loginActivity == null || loginActivity.isFinishing())
-                return;
-
-            loginActivity.loginProgressBar.setVisibility(View.INVISIBLE);
+            String profileName = "", profileDesignation = "", profileBeat = "", profileRange = "", profileDivision = "";
+            loginProgressBar.setVisibility(View.INVISIBLE);
             switch (option) {
                 case 1: {
-                    loginActivity.loginTextView.setText("EMAIL NOT REGISTERED");
+                    loginTextView.setText("EMAIL NOT REGISTERED");
                     break;
                 }
                 case 2: {
-                    loginActivity.loginTextView.setText("PASSWORD INCORRECT");
+                    loginTextView.setText("PASSWORD INCORRECT");
                     break;
                 }
                 case 3: {
-                    loginActivity.loginTextView.setText("PASSWORD NOT REGISTERED");
+                    loginTextView.setText("PASSWORD NOT REGISTERED");
                     break;
                 }
                 case 4: {
-                    loginActivity.loginTextView.setText("LOGGING YOU");
+                    loginTextView.setText("LOGGING YOU");
 
                     try {
                         profileName = userProfile.getString("name");
-                        profileEmail = userProfile.getString("email");
                         profileDesignation = userProfile.getString("designation");
                         profileBeat = userProfile.getString("beat");
                         profileRange = userProfile.getString("range");
@@ -210,23 +166,31 @@ public class LoginActivity extends Activity {
                         e.printStackTrace();
                     }
 
-                    SaveSharedPreference.setEmail(loginActivity, registeredEmail);
-                    SaveSharedPreference.setPassword(loginActivity, registeredPassword);
-                    SaveSharedPreference.setName(loginActivity, profileName);
-                    SaveSharedPreference.setDesignation(loginActivity, profileDesignation);
-                    SaveSharedPreference.setBeat(loginActivity, profileBeat);
-                    SaveSharedPreference.setRange(loginActivity, profileRange);
-                    SaveSharedPreference.setDivision(loginActivity, profileDivision);
+                    SaveSharedPreference.setEmail(this, email);
+                    SaveSharedPreference.setPassword(this, password);
+                    SaveSharedPreference.setName(this, profileName);
+                    SaveSharedPreference.setDesignation(this, profileDesignation);
+                    SaveSharedPreference.setBeat(this, profileBeat);
+                    SaveSharedPreference.setRange(this, profileRange);
+                    SaveSharedPreference.setDivision(this, profileDivision);
                     break;
                 }
                 default:
                     break;
             }
             Handler handler = new Handler();
+            int finalOption = option;
             handler.postDelayed(() -> {
-                loginActivity.loginTextView.setVisibility(View.INVISIBLE);
-                if (option.equals(4)) loginActivity.startMainActivity();
-            }, 1000);
-        }
+                loginTextView.setVisibility(View.INVISIBLE);
+                if (finalOption == 4) startMainActivity();
+            }, 2000);
+
+        }, error -> {
+            Log.d(LOG_TAG, "post request failed");
+            error.printStackTrace();
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 }
