@@ -3,6 +3,7 @@ package com.example.forestofficerapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,6 +19,10 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
@@ -27,6 +32,7 @@ import java.util.List;
 
 public class ReportListActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, NavigationView.OnNavigationItemSelectedListener{
 
+    private final String LOG_TAG = this.getClass().getSimpleName();
     private MaterialToolbar topAppBar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -97,10 +103,24 @@ public class ReportListActivity extends AppCompatActivity implements AdapterView
             return true;
         } else if (item.getItemId()==R.id.logoutButton) {
             SaveSharedPreference.clearPreferences(this);
+            logoutFromApp();
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
         }
         return true;
+    }
+
+    private void logoutFromApp() {
+        String url = LoginOptionActivity.BASE_URL+MainActivity.logoutURL;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, null, null, error -> {
+            Log.d(LOG_TAG, "post request failed");
+            error.printStackTrace();
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 
     @Override

@@ -15,6 +15,7 @@ public class SaveSharedPreference {
     static final String beatKey = "BEAT";
     static final String rangeKey = "RANGE";
     static final String divisionKey = "PASSWORD";
+    static final String employeeIdKey = "EMPLOYEE_ID";
 
     static SharedPreferences getSharedPreferences(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -62,6 +63,12 @@ public class SaveSharedPreference {
         editor.commit();
     }
 
+    public static void setEmployeeID(Context ctx, String division) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(employeeIdKey, division);
+        editor.commit();
+    }
+
     public static String getEmail(Context ctx) {
         return getSharedPreferences(ctx).getString(emailKey, "");
     }
@@ -88,6 +95,10 @@ public class SaveSharedPreference {
 
     public static String getDivision(Context ctx) {
         return getSharedPreferences(ctx).getString(divisionKey, "");
+    }
+
+    public static String getEmployeeID(Context ctx) {
+        return getSharedPreferences(ctx).getString(employeeIdKey, "");
     }
 
     public static void clearPreferences(Context ctx) {

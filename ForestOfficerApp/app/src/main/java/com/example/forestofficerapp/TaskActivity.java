@@ -41,10 +41,11 @@ import java.text.SimpleDateFormat;
 public class TaskActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
-    private static final String taskURL = "/new_taskreport";
+    private static final String taskURL = "/taskreport/";
 
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
+    private Bitmap photo;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
 
     private MaterialToolbar topAppBar;
@@ -56,6 +57,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     private ProgressBar progressBar;
     private Task task;
     private int taskIndex;
+    private String writtenReport;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,6 +96,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         taskDeadline.setText(deadlineDate);
 
         taskCameraButton.setOnClickListener(v -> {
+            writtenReport = taskReport.getEditText().getText().toString();
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
         });
@@ -182,8 +185,9 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
+            taskReport.getEditText().setText(writtenReport);
         }
     }
 
@@ -193,10 +197,24 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
             return true;
         } else if (item.getItemId()==R.id.logoutButton) {
             SaveSharedPreference.clearPreferences(this);
+            logoutFromApp();
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
         }
         return true;
+    }
+
+    private void logoutFromApp() {
+        String url = LoginOptionActivity.BASE_URL+MainActivity.logoutURL;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, null, null, error -> {
+            Log.d(LOG_TAG, "post request failed");
+            error.printStackTrace();
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 
     @Override

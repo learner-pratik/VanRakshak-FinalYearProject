@@ -244,6 +244,15 @@
                 android:text="5"/>
         </RelativeLayout>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sampleButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SAMPLE BUTTON"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="20dp"/>
+
     </LinearLayout>
     
     <com.google.android.material.navigation.NavigationView
