@@ -72,8 +72,19 @@ request - {
 	"alert" : "true"
 }
 response - {
-	"name" : "<alert_name>",
-	"type" : "true/false(boolean)", // true for camera-alerts, false for sos-alerts
+	"action" : "<alert_type>",
+	"timestamp" : "<alert_time>",
+	"camera_id" : "<camera_id>",
 	"latitude" : "<latitude>",
-	"longitude" : "<longitude>"
+	"longitude" : "<longitude>",
+}
+
+7. task
+response - {
+	"id" : "<task_id>"
+	"name" : "<task_name>",
+	"type" : "<task_type>",
+	"description : "<task_description>",
+	"assigning_offcier" : "<officer_name>",
+	"deadline" : "<task_deadline_date>"
 }

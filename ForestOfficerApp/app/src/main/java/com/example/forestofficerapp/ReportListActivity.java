@@ -22,13 +22,16 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ReportListActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, NavigationView.OnNavigationItemSelectedListener{
 
@@ -102,8 +105,8 @@ public class ReportListActivity extends AppCompatActivity implements AdapterView
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         } else if (item.getItemId()==R.id.logoutButton) {
-            SaveSharedPreference.clearPreferences(this);
             logoutFromApp();
+            SaveSharedPreference.clearPreferences(this);
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
         }
@@ -112,15 +115,28 @@ public class ReportListActivity extends AppCompatActivity implements AdapterView
 
     private void logoutFromApp() {
         String url = LoginOptionActivity.BASE_URL+MainActivity.logoutURL;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                url, null, null, error -> {
-            Log.d(LOG_TAG, "post request failed");
-            error.printStackTrace();
-        });
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        System.out.println(authToken);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    // response
+                    Log.d("Logout-response", response);
+                },
+                error -> {
+                    // TODO Auto-generated method stub
+                    Log.d("ERROR","error => "+error.toString());
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonObjectRequest);
+        requestQueue.add(postRequest);
     }
 
     @Override

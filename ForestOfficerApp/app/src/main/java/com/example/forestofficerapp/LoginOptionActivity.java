@@ -22,6 +22,11 @@ public class LoginOptionActivity extends Activity {
         Button registerButton = findViewById(R.id.registerButton);
         Button loginButton = findViewById(R.id.loginButton);
 
+        if (!ForestService.isForestServiceRunning) {
+            Intent serviceIntent = new Intent(this, ForestService.class);
+            startService(serviceIntent);
+        }
+
         String loginEmail = SaveSharedPreference.getEmail(this);
         String loginPassword = SaveSharedPreference.getPassword(this);
 

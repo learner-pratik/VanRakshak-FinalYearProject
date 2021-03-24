@@ -35,6 +35,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -52,11 +53,13 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ReportActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
-    private static final String reportURL = "/report/";
+    private static final String reportURL = "/report_api/";
 
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
@@ -147,12 +150,14 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
 
     private void sendReport() {
 
-        String geoLatitude = String.valueOf(MainActivity.currentLocation.getLatitude());
-        String geoLongitude = String.valueOf(MainActivity.currentLocation.getLongitude());
+        String geoLatitude = "19.72718";
+        String geoLongitude = "72.19834";
         String name = reportName.getEditText().getText().toString();
         String description = reportDescription.getEditText().getText().toString();
         String url = LoginOptionActivity.BASE_URL+reportURL;
         String clickedPicture = BitMapToString(photo);
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        System.out.println(authToken);
 
         progressBar.setVisibility(View.VISIBLE);
         progressMessage.setVisibility(View.VISIBLE);
@@ -160,7 +165,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         JSONObject postData = new JSONObject();
         try {
             postData.put("empid", SaveSharedPreference.getEmployeeID(this));
-            postData.put("name", name);
+            postData.put("name", SaveSharedPreference.getName(this));
             postData.put("type", reportType);
             postData.put("description", description);
             postData.put("latitude", geoLatitude);
@@ -196,7 +201,14 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         }, error -> {
             Log.d(LOG_TAG, "post request failed");
             error.printStackTrace();
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jsonObjectRequest);
@@ -207,8 +219,8 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         } else if (item.getItemId()==R.id.logoutButton) {
-            SaveSharedPreference.clearPreferences(this);
             logoutFromApp();
+            SaveSharedPreference.clearPreferences(this);
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
         }
@@ -217,15 +229,28 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
 
     private void logoutFromApp() {
         String url = LoginOptionActivity.BASE_URL+MainActivity.logoutURL;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                url, null, null, error -> {
-            Log.d(LOG_TAG, "post request failed");
-            error.printStackTrace();
-        });
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        System.out.println(authToken);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    // response
+                    Log.d("Logout-response", response);
+                },
+                error -> {
+                    // TODO Auto-generated method stub
+                    Log.d("ERROR","error => "+error.toString());
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonObjectRequest);
+        requestQueue.add(postRequest);
     }
 
     @Override

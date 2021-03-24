@@ -138,7 +138,7 @@ public class LoginActivity extends Activity {
                 option = 4;
             }
 
-            String profileName = "", profileDesignation = "", profileBeat = "", profileRange = "", profileDivision = "", profileEmployeeID="";
+            String profileName = "", profileDesignation = "", profileBeat = "", profileRange = "", profileDivision = "", profileEmployeeID="", authToken="";
             loginProgressBar.setVisibility(View.INVISIBLE);
             switch (option) {
                 case 1: {
@@ -163,6 +163,8 @@ public class LoginActivity extends Activity {
                         profileRange = userProfile.getString("range");
                         profileDivision = userProfile.getString("division");
                         profileEmployeeID = userProfile.getString("empid");
+                        authToken = response.getString("token");
+                        System.out.println(authToken);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -175,6 +177,7 @@ public class LoginActivity extends Activity {
                     SaveSharedPreference.setRange(this, profileRange);
                     SaveSharedPreference.setDivision(this, profileDivision);
                     SaveSharedPreference.setEmployeeID(this, profileEmployeeID);
+                    SaveSharedPreference.setAuthToken(this, authToken);
                     break;
                 }
                 default:

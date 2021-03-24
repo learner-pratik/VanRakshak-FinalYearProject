@@ -22,9 +22,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -42,6 +46,9 @@ import com.google.android.material.navigation.NavigationView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
@@ -50,8 +57,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle drawerToggle;
     private TextView name, email, designation, beat, range, division, headerOfficerName, headerOfficerDesignation;
     public static final String logoutURL = "/logout/";
-    public static final String sessionURL = "/session_api/";
-    private MaterialButton sampleButton;
 
     public static FusedLocationProviderClient fusedLocationProviderClient;
     public static Location currentLocation;
@@ -88,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         division = findViewById(R.id.profileDivisionName);
         headerOfficerName = findViewById(R.id.personName);
         headerOfficerDesignation = findViewById(R.id.personDesignation);
-        sampleButton = findViewById(R.id.sampleButton);
 
         setSupportActionBar(topAppBar);
         setNavigationViewListener();
@@ -104,29 +108,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         division.setText(SaveSharedPreference.getDivision(this));
 //        headerOfficerName.setText(SaveSharedPreference.getName(this));
 //        headerOfficerDesignation.setText(SaveSharedPreference.getDesignation(this));
-        sampleButton.setOnClickListener(v -> {
-            sendSamplePostRequest();
-        });
-
-    }
-
-    private void sendSamplePostRequest() {
-        String url = LoginOptionActivity.BASE_URL+sessionURL;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                url, null, response -> {
-            try {
-                Log.d(LOG_TAG, response.getString("session"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, error -> {
-            Log.d(LOG_TAG, "post request failed");
-            error.printStackTrace();
-        });
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonObjectRequest);
     }
 
     private void getLastDeviceLocation() {
@@ -139,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            Log.d(LOG_TAG, "did not get permission");
             return;
         }
         fusedLocationProviderClient.getLastLocation()
@@ -146,8 +128,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (location != null) {
                         currentLocation = location;
                         Log.d(LOG_TAG, "Printing current location");
-                        Log.d(LOG_TAG, String.valueOf(location.getLatitude()));
-                        Log.d(LOG_TAG, String.valueOf(location.getLongitude()));
+                        Log.d(LOG_TAG, String.valueOf(currentLocation.getLatitude()));
+                        Log.d(LOG_TAG, String.valueOf(currentLocation.getLongitude()));
+                    } else {
+                        Log.d(LOG_TAG, "Retrieving location failed");
                     }
                 });
 
@@ -179,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStop() {
         super.onStop();
         stopLocationUpdates();
+        Intent serviceIntent = new Intent(this, ForestService.class);
+        stopService(serviceIntent);
     }
 
     private void stopLocationUpdates() {
@@ -190,8 +176,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         } else if (item.getItemId()==R.id.logoutButton) {
-            SaveSharedPreference.clearPreferences(this);
             logoutFromApp();
+            SaveSharedPreference.clearPreferences(this);
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
         }
@@ -200,15 +186,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void logoutFromApp() {
         String url = LoginOptionActivity.BASE_URL+logoutURL;
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                url, null, null, error -> {
-            Log.d(LOG_TAG, "post request failed");
-            error.printStackTrace();
-        });
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        System.out.println(authToken);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    // response
+                    Log.d("Logout-response", response);
+                },
+                error -> {
+                    // TODO Auto-generated method stub
+                    Log.d("ERROR","error => "+error.toString());
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonObjectRequest);
+        requestQueue.add(postRequest);
     }
 
     @Override
