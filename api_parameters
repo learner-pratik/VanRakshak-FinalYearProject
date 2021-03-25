@@ -72,6 +72,7 @@ request - {
 	"alert" : "true"
 }
 response - {
+	"response_type" : "alert",
 	"action" : "<alert_type>",
 	"timestamp" : "<alert_time>",
 	"camera_id" : "<camera_id>",
@@ -81,6 +82,7 @@ response - {
 
 7. task
 response - {
+	"response_type" : "task",
 	"id" : "<task_id>"
 	"name" : "<task_name>",
 	"type" : "<task_type>",
