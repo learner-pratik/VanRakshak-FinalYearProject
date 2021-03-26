@@ -26,6 +26,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -37,14 +38,17 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TaskActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
-    private static final String taskURL = "/new_taskreport";
+    private static final String taskURL = "/taskreport/";
 
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
+    private Bitmap photo;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
 
     private MaterialToolbar topAppBar;
@@ -56,6 +60,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     private ProgressBar progressBar;
     private Task task;
     private int taskIndex;
+    private String writtenReport;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,6 +99,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         taskDeadline.setText(deadlineDate);
 
         taskCameraButton.setOnClickListener(v -> {
+            writtenReport = taskReport.getEditText().getText().toString();
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
         });
@@ -182,8 +188,9 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
+            taskReport.getEditText().setText(writtenReport);
         }
     }
 
@@ -192,11 +199,38 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         } else if (item.getItemId()==R.id.logoutButton) {
+            logoutFromApp();
             SaveSharedPreference.clearPreferences(this);
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
         }
         return true;
+    }
+
+    private void logoutFromApp() {
+        String url = LoginOptionActivity.BASE_URL+MainActivity.logoutURL;
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        System.out.println(authToken);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    // response
+                    Log.d("Logout-response", response);
+                },
+                error -> {
+                    // TODO Auto-generated method stub
+                    Log.d("ERROR","error => "+error.toString());
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(postRequest);
     }
 
     @Override

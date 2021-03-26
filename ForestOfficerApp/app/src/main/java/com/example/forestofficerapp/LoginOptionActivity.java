@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 public class LoginOptionActivity extends Activity {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
-    public static final String BASE_URL = "https://forestweb.herokuapp.com";
+    public static final String BASE_URL = "https://vanrakshak.herokuapp.com";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -22,15 +22,16 @@ public class LoginOptionActivity extends Activity {
         Button registerButton = findViewById(R.id.registerButton);
         Button loginButton = findViewById(R.id.loginButton);
 
+        if (!ForestService.isForestServiceRunning) {
+            Intent serviceIntent = new Intent(this, ForestService.class);
+            startService(serviceIntent);
+        }
+
         String loginEmail = SaveSharedPreference.getEmail(this);
         String loginPassword = SaveSharedPreference.getPassword(this);
 
         Log.d(LOG_TAG, "Email is "+ loginEmail);
         Log.d(LOG_TAG, "Password is "+ loginPassword);
-
-        if (!ForestService.isForestServiceRunning) {
-
-        }
 
         if (!loginEmail.isEmpty() && !loginPassword.isEmpty()) {
             Intent mainActivityIntent = new Intent(this, MainActivity.class);

@@ -31,110 +31,123 @@
                 app:menu="@menu/appbar_menu" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <TextView
-            android:id="@+id/txt_bundle"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginBottom="10dp"
-            android:text="Empty" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/report_name"
-            tyle="@style/Widget.Design.TextInputLayout"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="10dp"
-            android:hint="@string/reportEditText_name">
+            android:fillViewport="true">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text" />
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <TextView
+                    android:id="@+id/txt_bundle"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Empty" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/report_description"
-            style="@style/Widget.Vanrakshak.TextInputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="10dp"
-            android:hint="@string/reportDescription_name">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/report_name"
+                    tyle="@style/Widget.Design.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/reportEditText_name">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:lines="4" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageView
-            android:id="@+id/picture_taken"
-            android:layout_width="150dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
-            android:background="@color/colorAccent" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/report_description"
+                    style="@style/Widget.Vanrakshak.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/reportDescription_name">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/take_picture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/cameraButton_name"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:lines="4" />
 
-        <ProgressBar
-            android:id="@+id/reportProgressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
-            android:indeterminate="true"
-            android:visibility="invisible"
-            tools:visibility="visible"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/reportProgressMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textSize="20sp"
-            android:layout_marginBottom="10dp"
-            android:visibility="invisible"
-            tools:visibility="visible"
-            android:text="Submitting Report"/>
+                <ImageView
+                    android:id="@+id/picture_taken"
+                    android:layout_width="150dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="10dp"
+                    android:background="@color/colorAccent" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="20dp">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/take_picture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/cameraButton_name"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/submit_report"
-                style="@style/Widget.Vanrakshak.Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:text="@string/submitButton_name"/>
+                <ProgressBar
+                    android:id="@+id/reportProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="10dp"
+                    android:indeterminate="true"
+                    android:visibility="invisible"
+                    tools:visibility="visible"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/cancel_report"
-                style="@style/Widget.Vanrakshak.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cancelButton_name"/>
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/reportProgressMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="20sp"
+                    android:layout_marginBottom="10dp"
+                    android:visibility="invisible"
+                    tools:visibility="visible"
+                    android:text="Submitting Report"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="20dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/submit_report"
+                        style="@style/Widget.Vanrakshak.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:text="@string/submitButton_name"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/cancel_report"
+                        style="@style/Widget.Vanrakshak.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cancelButton_name"/>
+                </RelativeLayout>
+
+            </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 

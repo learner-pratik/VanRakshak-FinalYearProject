@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,6 +35,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -49,18 +51,23 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ReportActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
-    private static final String reportURL = "/new_report";
+    private static final String reportURL = "/report_api/";
 
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
+    private Bitmap photo;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
 
     private String reportType;
+    private String writtenName, writtenDescription;
     private FusedLocationProviderClient fusedLocationClient;
     private TextInputLayout reportDescription, reportName;
     private MaterialToolbar topAppBar;
@@ -112,6 +119,8 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
 //                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 //                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
 //                }
+            writtenName = reportName.getEditText().getText().toString();
+            writtenDescription = reportDescription.getEditText().getText().toString();
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
         });
@@ -130,25 +139,38 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         startActivity(mainActivityIntent);
     }
 
+    public String BitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+        byte [] b=baos.toByteArray();
+        String temp= Base64.encodeToString(b, Base64.DEFAULT);
+        System.out.println(temp);
+        return temp;
+    }
+
     private void sendReport() {
 
-        String geoLatitude = String.valueOf(MainActivity.currentLocation.getLatitude());
-        String geoLongitude = String.valueOf(MainActivity.currentLocation.getLongitude());
+        String geoLatitude = "19.72718";
+        String geoLongitude = "72.19834";
         String name = reportName.getEditText().getText().toString();
         String description = reportDescription.getEditText().getText().toString();
         String url = LoginOptionActivity.BASE_URL+reportURL;
+        String clickedPicture = BitMapToString(photo);
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        System.out.println(authToken);
 
         progressBar.setVisibility(View.VISIBLE);
         progressMessage.setVisibility(View.VISIBLE);
 
         JSONObject postData = new JSONObject();
         try {
-            postData.put("email", SaveSharedPreference.getEmail(this));
-            postData.put("name", name);
+            postData.put("empid", SaveSharedPreference.getEmployeeID(this));
+            postData.put("name", SaveSharedPreference.getName(this));
             postData.put("type", reportType);
             postData.put("description", description);
             postData.put("latitude", geoLatitude);
             postData.put("longitude", geoLongitude);
+            postData.put("image", clickedPicture);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -179,7 +201,14 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         }, error -> {
             Log.d(LOG_TAG, "post request failed");
             error.printStackTrace();
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jsonObjectRequest);
@@ -190,11 +219,38 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         } else if (item.getItemId()==R.id.logoutButton) {
+            logoutFromApp();
             SaveSharedPreference.clearPreferences(this);
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
         }
         return true;
+    }
+
+    private void logoutFromApp() {
+        String url = LoginOptionActivity.BASE_URL+MainActivity.logoutURL;
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        System.out.println(authToken);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    // response
+                    Log.d("Logout-response", response);
+                },
+                error -> {
+                    // TODO Auto-generated method stub
+                    Log.d("ERROR","error => "+error.toString());
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(postRequest);
     }
 
     @Override
@@ -256,8 +312,10 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
+            reportName.getEditText().setText(writtenName);
+            reportDescription.getEditText().setText(writtenDescription);
         }
     }
 }
