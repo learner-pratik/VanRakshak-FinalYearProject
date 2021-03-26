@@ -66,18 +66,21 @@ response - {
 	"status" : "true/false(boolean)"
 }
 
-6. alert 
+6. Alert (From Server) 
 url - "/alert"
 request - {
 	"alert" : "true"
 }
 response - {
-	"response_type" : "alert",
-	"action" : "<alert_type>",
-	"timestamp" : "<alert_time>",
+	"type" : "<alert_type>" // hunter, sos, working
 	"camera_id" : "<camera_id>",
-	"latitude" : "<latitude>",
-	"longitude" : "<longitude>",
+	"latitude" : "<geo-latitude>",
+	"longitude" : "<geo-longitude>",
+	"timestamp" : "alert-time",
+	"sos_type" : "<sos_alert_type>" // animal intrusion, tree fall, medical emergency, unidentified object, other
+	"name" : "<user_name>",
+	"phone_number" : "<user_phone_number>",
+	"address" : "user_address",
 }
 
 7. task
@@ -91,27 +94,19 @@ response - {
 	"deadline" : "<task_deadline_date>"
 }
 
-8. Camera Alert
-url = "/camera-alert"
+8. Alert (To server)
+url - "/alert_api"
 request - {
+	"type" : "<alert_type>" // hunter, sos, working
 	"camera_id" : "<camera_id>",
-	"type" : "<alert_type>" // hunter or animal, string
-	"animal_type" : "<animal_name>",
 	"latitude" : "<geo-latitude>",
 	"longitude" : "<geo-longitude>",
 	"timestamp" : "alert-time",
-}
-response - {
-	"status" : "<true/false>" //boolean
-}
-
-9. SOS Alert
-url - "/sos-alert"
-request - {
-	"type" : "<alert_type>",
+	"sos_type" : "<sos_alert_type>" // animal intrusion, tree fall, medical emergency, unidentified object, other
 	"name" : "<user_name>",
 	"phone_number" : "<user_phone_number>",
 	"address" : "user_address",
-	"latitude" : "<geo-latitude>",
-	"longitude" : "<geo-longitude>",
+}
+response - {
+	"status" : "true/false" //boolean
 }
