@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 public class RegisterPasswordActivity extends Activity {
 
-    private static final String registerURL = "/new_register";
+    private static final String registerURL = "/register/";
     private final String LOG_TAG = this.getClass().getSimpleName();
 
     private TextInputLayout newPasswordEditText, confirmPasswordEditText;

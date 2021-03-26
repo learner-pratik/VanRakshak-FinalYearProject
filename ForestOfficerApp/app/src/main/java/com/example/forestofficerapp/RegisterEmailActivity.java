@@ -1,4 +1,4 @@
-  package com.example.forestofficerapp;
+package com.example.forestofficerapp;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -45,7 +45,7 @@ import javax.mail.internet.MimeMessage;
   public class RegisterEmailActivity extends Activity {
 
     private final String LOG_TAG = RegisterEmailActivity.this.getClass().getSimpleName();
-    private static final String emailURL = "/new_check";
+    private static final String emailURL = "/check/";
     private TextInputLayout emailText;
     private ProgressBar emailProgressBar;
     private TextView otpTextView;

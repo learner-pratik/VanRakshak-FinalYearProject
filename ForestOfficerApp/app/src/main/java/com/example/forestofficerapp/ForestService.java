@@ -18,7 +18,7 @@ public class ForestService extends Service {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
     private WebSocketClient webSocketClient;
-    public static Boolean isForestServiceRunning;
+    public static Boolean isForestServiceRunning = false;
 
     @Override
     public void onCreate() {
@@ -52,7 +52,7 @@ public class ForestService extends Service {
 
             @Override
             public void onMessage(String message) {
-
+                Log.d(LOG_TAG, "Message from Server: "+message);
             }
 
             @Override

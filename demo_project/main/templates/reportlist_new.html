@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+      <style>
+         .table {
+         border-spacing: 0 40px;
+         border-collapse: separate;
+         border: 1px solid white;
+         }
+         .table-bordered th{
+         border: 1px solid #07c560;
+         }
+         .table-bordered td {
+         border: 1px solid #d3ffcc;
+         }
+         thead tr {
+         background-color: #07c560;
+         box-shadow: 5px 8px 10px #646566;
+         border-radius: 10px;
+         }
+         .table thead tr th, td {
+         padding: 15px;
+         font-size: 25px;
+         font-weight: 800;
+         font-family: cursive;
+         font-style: normal;
+         }
+         tbody tr {
+         background-color: #d3ffcc;
+         box-shadow: 8px 5px 10px #646566;
+         margin: 0;
+         }
+         .tablefilter {
+         text-align: center;
+         width: 100%;
+         padding: 10px;
+         }
+         .dropdown {
+         display: inline-block;
+         margin: 15px;
+         }
+      </style>
+   </head>
+
+   <body>
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body container text-center"></div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+         <a class="navbar-brand" href="#">Navbar</a>
+         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+         </button>
+
+         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+               <li class="nav-item active">
+                  <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+               </li>
+               <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Dropdown
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="#">Action</a>
+                  <a class="dropdown-item" href="#">Another action</a>
+                  <div class="dropdown-divider"></div>
+                     <a class="dropdown-item" href="#">Something else here</a>
+                  </div>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+               </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+               <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+               <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+         </div>
+      </nav>
+
+      <div class="container tablefilter"></div>
+
+      <div class="container-fluid maincontainer" style="margin-top: 60px;"></div>
+      <!-- JS, Popper.js, and jQuery -->
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+      <script>
+         loginflag = "admin"; 
+         // values - admin, division, range, beat
+
+         report1 = {rep_id:"rep-1", emp_id:"id-1", desc:"This is a report", image:"This is image", latitude:"19.2777", longitude:"72.5645", timestamp:"2020/07/30-23:34"}
+         report2 = {rep_id:"rep-2", emp_id:"id-1", desc:"This is a report", image:"This is image", latitude:"19.2777", longitude:"72.5645", timestamp:"2020/07/30-23:34"}
+         report3 = {rep_id:"rep-3", emp_id:"id-2", desc:"This is a report", image:"This is image", latitude:"19.2777", longitude:"72.5645", timestamp:"2020/07/30-23:34"}
+         report4 = {rep_id:"rep-4", emp_id:"id-2", desc:"This is a report", image:"This is image", latitude:"19.2777", longitude:"72.5645", timestamp:"2020/07/30-23:34"}
+         reports = {"id-1":[report1, report2], "id-2":[report3, report4]} // used when loginflag is beat
+         reportsbeats = {"b-1":{"id-1":[report1, report2]}, "b-2":{"id-2":[report3, report4]}} // used when loginflag is range
+         reportsrange = {"r-1":reportsbeats} // used when loginflag is division
+         reportsadmin = {"d-1":reportsrange} // used when loginflag is admin
+
+         // for setting up the initial page with button and table
+         if (loginflag=="admin") {
+
+            let divisiondropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+            let rangedropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+            let beatsdropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+            let employeedropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+
+            let divisionbutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "divisiondropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Division",
+            }); 
+            let rangebutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "rangedropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Range",
+            }); 
+            let beatsbutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "beatsdropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Beat",
+            }); 
+            let employeebutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "employeedropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Employee",
+            }); 
+
+            let divisiondropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "divisiondropdownbutton",
+            });
+            let rangedropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "rangedropdownbutton",
+            });
+            let beatsdropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "beatsdropdownbutton",
+            });
+            let employeedropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "employeedropdownbutton",
+            });
+
+            let divisiondropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item divisionbutton",
+               "text" : "All",
+               "id" : "d-all",
+            });
+            var rangedropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item rangebutton",
+               "text" : "All",
+               "id" : "r-all",
+            });
+            let beatsdropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item beatbutton",
+               "text" : "All",
+               "id" : "b-all",
+            });
+            let employeedropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item employeebutton",
+               "text" : "All",
+               "id" : "e-all",
+            });
+
+            divisiondropdownmenu.append(divisiondropdownmenubutton);
+            rangedropdownmenu.append(rangedropdownmenubutton);
+            beatsdropdownmenu.append(beatsdropdownmenubutton);
+            employeedropdownmenu.append(employeedropdownmenubutton);
+
+            let table = $("<table>", {
+               "class" : "table table-bordered",
+            });
+            let thead = $("<thead>");
+            let headrow = $("<tr>");
+            headrow.append("<th class='text-center'>Report No</th>");
+            headrow.append("<th class='text-center'>Division</th>");
+            headrow.append("<th class='text-center'>Range</th>");
+            headrow.append("<th class='text-center'>Beat</th>");
+            headrow.append("<th class='text-center'>Employee ID</th>");
+            headrow.append("<th class='text-center'>Timestamp</th>");
+            thead.append(headrow);
+            let tbody = $("<tbody>");
+
+            for (divisionid in reportsadmin) {
+
+               divisiondropdownmenubutton = $("<button>", {
+                  "class" : "dropdown-item divisionbutton",
+                  "text" : divisionid,
+                  "id" : divisionid,
+               });
+               divisiondropdownmenu.append(divisiondropdownmenubutton);
+
+               for (rangeid in reportsadmin[divisionid]) {
+
+                  rangedropdownmenubutton = $("<button>", {
+                     "class" : "dropdown-item rangebutton",
+                     "text" : rangeid,
+                     "id" : divisionid+"/"+rangeid,
+                  });
+                  rangedropdownmenu.append(rangedropdownmenubutton);
+
+                  for (beatid in reportsadmin[divisionid][rangeid]) {
+
+                     beatsdropdownmenubutton = $("<button>", {
+                        "class" : "dropdown-item beatbutton",
+                        "text" : beatid,
+                        "id" : divisionid+"/"+rangeid+"/"+beatid,
+                        });
+                     beatsdropdownmenu.append(beatsdropdownmenubutton);
+
+                     for (employeeid in reportsadmin[divisionid][rangeid][beatid]) {
+                        
+                        employeedropdownmenubutton = $("<button>", {
+                           "class" : "dropdown-item employeebutton",
+                           "text" : employeeid,
+                           "id" : divisionid+"/"+rangeid+"/"+beatid+"/"+employeeid,
+                           });
+                        employeedropdownmenu.append(employeedropdownmenubutton);
+
+                        for (id in reportsadmin[divisionid][rangeid][beatid][employeeid]) {
+                           let row = $("<tr>", {
+                              "id" : divisionid+"_"+rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                              "class" : "tablerow-admin",
+                           });
+                           let reportidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["rep_id"],
+                           });
+                           let divisioncol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : divisionid
+                           });
+                           let rangecol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : rangeid,
+                           });
+                           let beatscol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : beatid
+                           });
+                           let empidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : employeeid,
+                           });
+                           let timestampcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["timestamp"],
+                           });
+                           row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                           tbody.append(row);
+                        }
+                     }
+                  }
+               }
+            }
+            table.append(thead).append(tbody);
+            $(".maincontainer").append(table);
+
+            divisiondropdown.append(divisionbutton).append(divisiondropdownmenu);
+            rangedropdown.append(rangebutton).append(rangedropdownmenu);
+            beatsdropdown.append(beatsbutton).append(beatsdropdownmenu);
+            employeedropdown.append(employeebutton).append(employeedropdownmenu);
+
+            $(".tablefilter").append(divisiondropdown)
+            .append(rangedropdown)
+            .append(beatsdropdown)
+            .append(employeedropdown);
+
+         } else if (loginflag=="division") {
+
+            let rangedropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+            let beatsdropdown = $("<div>", {
+                  "class" : "dropdown",
+            });
+            let employeedropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+
+            let rangebutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "rangedropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Range",
+            }); 
+            let beatsbutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "beatsdropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Beat",
+            });
+            let employeebutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "employeedropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Employee",
+            });  
+
+            let rangedropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "rangedropdownbutton",
+            });
+            let beatsdropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "beatsdropdownbutton",
+            });
+            let employeedropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "employeedropdownbutton",
+            });
+
+            let rangedropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item rangebutton",
+               "text" : "All",
+               "id" : "r-all",
+            });
+            let beatsdropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item beatbutton",
+               "text" : "All",
+               "id" : "b-all",
+            });
+            let employeedropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item employeebutton",
+               "text" : "All",
+               "id" : "e-all",
+            });
+
+            rangedropdownmenu.append(rangedropdownmenubutton);
+            beatsdropdownmenu.append(beatsdropdownmenubutton);
+            employeedropdownmenu.append(employeedropdownmenubutton);
+
+            let table = $("<table>", {
+               "class" : "table table-bordered",
+            });
+            let thead = $("<thead>");
+            let headrow = $("<tr>");
+            headrow.append("<th class='text-center'>Report No</th>");
+            headrow.append("<th class='text-center'>Range</th>");
+            headrow.append("<th class='text-center'>Beat</th>");
+            headrow.append("<th class='text-center'>Employee ID</th>");
+            headrow.append("<th class='text-center'>Timestamp</th>");
+            thead.append(headrow);
+            let tbody = $("<tbody>");
+
+            for (rangeid in reportsrange) {
+
+               rangedropdownmenubutton = $("<button>", {
+                  "class" : "dropdown-item rangebutton",
+                  "text" : rangeid,
+                  "id" : rangeid,
+               });
+               rangedropdownmenu.append(rangedropdownmenubutton);
+
+               for (beatid in reportsrange[rangeid]) {
+
+                  beatsdropdownmenubutton = $("<button>", {
+                     "class" : "dropdown-item beatbutton",
+                     "text" : beatid,
+                     "id" : rangeid+"/"+beatid,
+                  });
+                  beatsdropdownmenu.append(beatsdropdownmenubutton);
+
+                  for (employeeid in reportsrange[rangeid][beatid]) {
+                     employeedropdownmenubutton = $("<button>", {
+                        "class" : "dropdown-item employeebutton",
+                        "text" : employeeid,
+                        "id" : rangeid+"/"+beatid+"/"+employeeid,
+                     });
+                     employeedropdownmenu.append(employeedropdownmenubutton);
+
+                     for (id in reportsrange[rangeid][beatid][employeeid]) {
+                        let row = $("<tr>", {
+                           "id" : rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                           "class" : "tablerow-division",
+                        });
+                        let reportidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reportsrange[rangeid][beatid][employeeid][id]["rep_id"],
+                        });
+                        let rangecol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : rangeid,
+                        });
+                        let beatscol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : beatid,
+                        });
+                        let empidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : employeeid,
+                        });
+                        let timestampcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reportsrange[rangeid][beatid][employeeid][id]["timestamp"],
+                        });
+                        row.append(reportidcol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                        tbody.append(row);
+                     }
+                  }
+               }
+            }
+            table.append(thead).append(tbody);
+            $(".maincontainer").append(table);
+
+            rangedropdown.append(rangebutton).append(rangedropdownmenu);
+            beatsdropdown.append(beatsbutton).append(beatsdropdownmenu);
+            employeedropdown.append(employeebutton).append(employeedropdownmenu);
+
+            $(".tablefilter")
+            .append(rangedropdown)
+            .append(beatsdropdown)
+            .append(employeedropdown);
+
+         } else if (loginflag=="range") {
+
+            let beatsdropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+            let employeedropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+
+            let beatsbutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "beatsdropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Beat",
+            }); 
+            let employeebutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "employeedropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Employee",
+            });
+
+            let beatsdropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "beatsdropdownbutton",
+            });
+            let employeedropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "employeedropdownbutton",
+               });
+
+            let beatsdropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item beatbutton",
+               "text" : "All",
+               "id" : "b-all",
+            });
+            let employeedropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item employeebutton",
+               "text" : "All",
+               "id" : "e-all",
+            });
+
+            beatsdropdownmenu.append(beatsdropdownmenubutton);
+            employeedropdownmenu.append(employeedropdownmenubutton);
+
+            let table = $("<table>", {
+               "class" : "table table-bordered",
+            });
+            let thead = $("<thead>");
+            let headrow = $("<tr>");
+            headrow.append("<th class='text-center'>Report No</th>");
+            headrow.append("<th class='text-center'>Beat</th>");
+            headrow.append("<th class='text-center'>Employee ID</th>");
+            headrow.append("<th class='text-center'>Timestamp</th>");
+            thead.append(headrow);
+            let tbody = $("<tbody>");
+
+            for (beatid in reportsbeats) {
+
+               beatsdropdownmenubutton = $("<button>", {
+                  "class" : "dropdown-item beatbutton",
+                  "text" : beatid,
+                  "id" : beatid,
+               });
+               beatsdropdownmenu.append(beatsdropdownmenubutton);
+
+               for (employeeid in reportsbeats[beatid]) {
+
+                  employeedropdownmenubutton = $("<button>", {
+                     "class" : "dropdown-item employeebutton",
+                     "text" : employeeid,
+                     "id" : beatid+"/"+employeeid,
+                  });
+                  employeedropdownmenu.append(employeedropdownmenubutton);
+
+                  for (id in reportsbeats[beatid][employeeid]) {
+                     let row = $("<tr>", {
+                        "id" : beatid+"_"+employeeid+"_"+id,
+                        "class" : "tablerow-range",
+                     });
+                     let reportidcol = $("<td>", {
+                        "class" : "text-center",
+                        "text" : reportsbeats[beatid][employeeid][id]["rep_id"],
+                     });
+                     let beatscol = $("<td>", {
+                        "class" : "text-center",
+                        "text" : beatid,
+                     });
+                     let empidcol = $("<td>", {
+                        "class" : "text-center",
+                        "text" : employeeid,
+                     });
+                     let timestampcol = $("<td>", {
+                        "class" : "text-center",
+                        "text" : reportsbeats[beatid][employeeid][id]["timestamp"],
+                     });
+                     row.append(reportidcol).append(beatscol).append(empidcol).append(timestampcol);
+                     tbody.append(row);
+                  }
+               }
+            }
+            table.append(thead).append(tbody);
+            $(".maincontainer").append(table);
+
+            beatsdropdown.append(beatsbutton).append(beatsdropdownmenu);
+            employeedropdown.append(employeebutton).append(employeedropdownmenu);
+
+            $(".tablefilter")
+            .append(beatsdropdown)
+            .append(employeedropdown);
+
+         } else if (loginflag=="beat") {
+            let employeedropdown = $("<div>", {
+               "class" : "dropdown",
+            });
+
+            let employeebutton = $("<button>", {
+               "class" : "btn btn-lg btn-success dropdown-toggle",
+               "type" : "button",
+               "id" : "employeedropdownbutton",
+               "data-toggle" : "dropdown",
+               "aria-haspopup" : "true",
+               "aria-expanded" : "false",
+               "text" : "Select Employee",
+            }); 
+
+            let employeedropdownmenu = $("<div>", {
+               "class" : "dropdown-menu",
+               "aria-labelledby" : "employeedropdownbutton",
+            });
+
+            let employeedropdownmenubutton = $("<button>", {
+               "class" : "dropdown-item employeebutton",
+               "text" : "All",
+               "id" : "e-all",
+            });
+
+            employeedropdownmenu.append(employeedropdownmenubutton);
+
+            let table = $("<table>", {
+               "class" : "table table-bordered",
+            });
+            let thead = $("<thead>");
+            let headrow = $("<tr>");
+            headrow.append("<th class='text-center'>Report No</th>");
+            headrow.append("<th class='text-center'>Employee ID</th>");
+            headrow.append("<th class='text-center'>Timestamp</th>");
+            thead.append(headrow);
+            let tbody = $("<tbody>");
+               
+            for (employeeid in reports) {
+               employeedropdownmenubutton = $("<button>", {
+                  "class" : "dropdown-item employeebutton",
+                  "text" : employeeid,
+                  "id" : employeeid,
+               });
+               employeedropdownmenu.append(employeedropdownmenubutton);
+
+               for (id in reports[employeeid]) {
+                  let row = $("<tr>", {
+                     "id" : employeeid+"_"+id,
+                     "class" : "tablerow-beats",
+                  });
+                  let reportidcol = $("<td>", {
+                     "class" : "text-center",
+                     "text" : reports[employeeid][id]["rep_id"],
+                  });
+                  let empidcol = $("<td>", {
+                     "class" : "text-center",
+                     "text" : reports[employeeid][id]["emp_id"],
+                  });
+                  let timestampcol = $("<td>", {
+                     "class" : "text-center",
+                     "text" : reports[employeeid][id]["timestamp"],
+                  });
+                  row.append(reportidcol).append(empidcol).append(timestampcol);
+                  tbody.append(row);
+               }
+            }
+            table.append(thead).append(tbody);
+            $(".maincontainer").append(table);
+
+            employeedropdown.append(employeebutton).append(employeedropdownmenu);
+            $(".tablefilter").append(employeedropdown);
+         }
+
+         // from here code for performing js operations
+         $(document).ready(function(){
+            $("#exampleModal").on("hide.bs.modal", function(){
+               $(this).find(".modal-body").empty();
+            });
+
+            // code for row click
+            $(".maincontainer").on("click", ".tablerow-admin", function(){
+               let mainid = $(this).attr("id").split("_");
+               console.log(mainid);
+
+               let reportid = $("<h2>", {
+                  "text" : reportsadmin[mainid[0]][mainid[1]][mainid[2]][mainid[3]][mainid[4]]["rep_id"],
+               });
+               let empid = $("<h3>", {
+                  "text" : reportsadmin[mainid[0]][mainid[1]][mainid[2]][mainid[3]][mainid[4]]["emp_id"],
+               });
+               let desc = $("<h5>", {
+                  "text" : reportsadmin[mainid[0]][mainid[1]][mainid[2]][mainid[3]][mainid[4]]["desc"],
+               });
+               let image = $("<img>", {
+                  "src" : "data:image/png;base64,"+reportsadmin[mainid[0]][mainid[1]][mainid[2]][mainid[3]][mainid[4]]["image"],
+               });
+               let latitude = $("<p>", {
+                  "text" : reportsadmin[mainid[0]][mainid[1]][mainid[2]][mainid[3]][mainid[4]]["latitude"],
+               });
+               let longitude = $("<p>", {
+                  "text" : reportsadmin[mainid[0]][mainid[1]][mainid[2]][mainid[3]][mainid[4]]["longitude"],
+               });
+               let timestamp = $("<p>", {
+                  "text" : reportsadmin[mainid[0]][mainid[1]][mainid[2]][mainid[3]][mainid[4]]["timestamp"],
+               });
+
+               $("#exampleModal").find(".modal-body")
+               .append(reportid)
+               .append(empid)
+               .append(desc)
+               .append(image)
+               .append(latitude)
+               .append(longitude)
+               .append(timestamp)
+
+               $("#exampleModal").modal("show");
+            });
+
+            // code for row click
+            $(".maincontainer").on("click", ".tablerow-division", function(){
+               let mainid = $(this).attr("id").split("_");
+
+               let reportid = $("<h2>", {
+                  "text" : reportsrange[mainid[0]][mainid[1]][mainid[2]][mainid[3]]["rep_id"],
+               });
+               let empid = $("<h3>", {
+                  "text" : reportsrange[mainid[0]][mainid[1]][mainid[2]][mainid[3]]["emp_id"],
+               });
+               let desc = $("<h5>", {
+                  "text" : reportsrange[mainid[0]][mainid[1]][mainid[2]][mainid[3]]["desc"],
+               });
+               let image = $("<img>", {
+                  "src" : "data:image/png;base64,"+reportsrange[mainid[0]][mainid[1]][mainid[2]][mainid[3]]["image"],
+               });
+               let latitude = $("<p>", {
+                  "text" : reportsrange[mainid[0]][mainid[1]][mainid[2]][mainid[3]]["latitude"],
+               });
+               let longitude = $("<p>", {
+                  "text" : reportsrange[mainid[0]][mainid[1]][mainid[2]][mainid[3]]["longitude"],
+               });
+               let timestamp = $("<p>", {
+                  "text" : reportsrange[mainid[0]][mainid[1]][mainid[2]][mainid[3]]["timestamp"],
+               });
+
+               $("#exampleModal").find(".modal-body")
+               .append(reportid)
+               .append(empid)
+               .append(desc)
+               .append(image)
+               .append(latitude)
+               .append(longitude)
+               .append(timestamp)
+
+               $("#exampleModal").modal("show");
+            });
+
+            // code for row click
+            $(".maincontainer").on("click", ".tablerow-range", function(){
+               let mainid = $(this).attr("id").split("_");
+
+               let reportid = $("<h2>", {
+                  "text" : reportsbeats[mainid[0]][mainid[1]][mainid[2]]["rep_id"],
+               });
+               let empid = $("<h3>", {
+                  "text" : reportsbeats[mainid[0]][mainid[1]][mainid[2]]["emp_id"],
+               });
+               let desc = $("<h5>", {
+                  "text" : reportsbeats[mainid[0]][mainid[1]][mainid[2]]["desc"],
+               });
+               let image = $("<img>", {
+                  "src" : "data:image/png;base64,"+reportsbeats[mainid[0]][mainid[1]][mainid[2]]["image"],
+               });
+               let latitude = $("<p>", {
+                  "text" : reportsbeats[mainid[0]][mainid[1]][mainid[2]]["latitude"],
+               });
+               let longitude = $("<p>", {
+                  "text" : reportsbeats[mainid[0]][mainid[1]][mainid[2]]["longitude"],
+               });
+               let timestamp = $("<p>", {
+                  "text" : reportsbeats[mainid[0]][mainid[1]][mainid[2]]["timestamp"],
+               });
+
+               $("#exampleModal").find(".modal-body")
+               .append(reportid)
+               .append(empid)
+               .append(desc)
+               .append(image)
+               .append(latitude)
+               .append(longitude)
+               .append(timestamp)
+
+               $("#exampleModal").modal("show");
+            });
+
+            // code for row click
+            $(".maincontainer").on("click", ".tablerow-beats", function(){
+               let mainid = $(this).attr("id").split("_");
+               console.log(mainid);
+               let reportid = $("<h2>", {
+                  "text" : reports[mainid[0]][mainid[1]]["rep_id"],
+               });
+               let empid = $("<h3>", {
+                  "text" : reports[mainid[0]][mainid[1]]["emp_id"],
+               });
+               let desc = $("<h5>", {
+                  "text" : reports[mainid[0]][mainid[1]]["desc"],
+               });
+               let image = $("<img>", {
+                  "src" : "data:image/png;base64,"+reports[mainid[0]][mainid[1]]["image"],
+               });
+               let latitude = $("<p>", {
+                  "text" : reports[mainid[0]][mainid[1]]["latitude"],
+               });
+               let longitude = $("<p>", {
+                  "text" : reports[mainid[0]][mainid[1]]["longitude"],
+               });
+               let timestamp = $("<p>", {
+                  "text" : reports[mainid[0]][mainid[1]]["timestamp"],
+               });
+
+               $("#exampleModal").find(".modal-body")
+               .append(reportid)
+               .append(empid)
+               .append(desc)
+               .append(image)
+               .append(latitude)
+               .append(longitude)
+               .append(timestamp)
+
+               $("#exampleModal").modal("show");
+            });
+
+            // code for division button dropdown
+            $(".tablefilter").on("click", ".divisionbutton", function(){
+               console.log("function called");
+               $(".maincontainer").empty();
+               let id = $(this).attr("id");
+               let idarr = $(this).attr("id").split("-");
+               console.log(id);
+
+               let table = $("<table>", {
+                  "class" : "table table-bordered",
+               });
+               let thead = $("<thead>");
+               let headrow = $("<tr>");
+               headrow.append("<th class='text-center'>Report No</th>");
+               headrow.append("<th class='text-center'>Division</th>");
+               headrow.append("<th class='text-center'>Range</th>");
+               headrow.append("<th class='text-center'>Beat</th>");
+               headrow.append("<th class='text-center'>Employee ID</th>");
+               headrow.append("<th class='text-center'>Timestamp</th>");
+               thead.append(headrow);
+               let tbody = $("<tbody>");
+
+               if (idarr[1]=="all") {
+                  for (divisionid in reportsadmin) {
+
+                     for (rangeid in reportsadmin[divisionid]) {
+
+                        for (beatid in reportsadmin[divisionid][rangeid]) {
+
+                           for (employeeid in reportsadmin[divisionid][rangeid][beatid]) {   
+
+                              for (id in reportsadmin[divisionid][rangeid][beatid][employeeid]) {
+                                 let row = $("<tr>", {
+                                    "id" : divisionid+"_"+rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                                    "class" : "tablerow-admin",
+                                 });
+                                 let reportidcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["rep_id"],
+                                 });
+                                 let divisioncol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : divisionid,
+                                 });
+                                 let rangecol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : rangeid,
+                                 });
+                                 let beatscol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : beatid,
+                                 });
+                                 let empidcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : employeeid,
+                                 });
+                                 let timestampcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["timestamp"],
+                                 });
+                                 row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                                 tbody.append(row);
+                              }
+                           }
+                        }
+                     }
+                  }
+                  table.append(thead).append(tbody);
+                  $(".maincontainer").append(table);
+
+               } else {
+                  for (rangeid in reportsadmin[id]) {
+
+                     for (beatid in reportsadmin[id][rangeid]) {
+
+                        for (employeeid in reportsadmin[id][rangeid][beatid]) {
+
+                           for (key in reportsadmin[id][rangeid][beatid][employeeid]) {
+                              let row = $("<tr>", {
+                                 "id" : id+"_"+rangeid+"_"+beatid+"_"+employeeid+"_"+key,
+                                 "class" : "tablerow-admin",
+                              });
+                              let reportidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsadmin[id][rangeid][beatid][employeeid][key]["rep_id"],
+                              });
+                              let divisioncol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : id,
+                              });
+                              let rangecol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : rangeid,
+                              });
+                              let beatscol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : beatid,
+                              });
+                              let empidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : employeeid,
+                              });
+                              var timestampcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsadmin[id][rangeid][beatid][employeeid][key]["timestamp"],
+                              });
+                              row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                              tbody.append(row);
+                           }
+                        }
+                     }
+                  }
+                  table.append(thead).append(tbody);
+                  $(".maincontainer").append(table);
+               }
+            });
+
+            // code for range button dropdown
+            $(".tablefilter").on("click", ".rangebutton", function(){
+               console.log("function called");
+               $(".maincontainer").empty();
+
+               if (loginflag=="admin") {
+
+                  let mainid = $(this).attr("id");
+                  let idarr;
+                  let flag;
+                  if(mainid.includes("/")) {
+                     flag = 1;
+                     idarr = $(this).attr("id").split("/");
+                  } else {
+                     flag = 0;
+                  }
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Division</th>");
+                  headrow.append("<th class='text-center'>Range</th>");
+                  headrow.append("<th class='text-center'>Beat</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+
+                  if (flag==0) {
+                     for (divisionid in reportsadmin) {
+
+                        for (rangeid in reportsadmin[divisionid]) {
+
+                           for (beatid in reportsadmin[divisionid][rangeid]) {
+
+                              for (employeeid in reportsadmin[divisionid][rangeid][beatid]) {
+
+                                 for (id in reportsadmin[divisionid][rangeid][beatid][employeeid]) {
+                                    let row = $("<tr>", {
+                                       "id" : divisionid+"_"+rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                                       "class" : "tablerow-admin",
+                                    });
+                                    let reportidcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["rep_id"],
+                                    });
+                                    let divisioncol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : divisionid,
+                                    });
+                                    let rangecol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : rangeid,
+                                    });
+                                    let beatscol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : beatid,
+                                    });
+                                    let empidcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : employeeid,
+                                    });
+                                    let timestampcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["timestamp"],
+                                    });
+                                    row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                                    tbody.append(row);
+                                 }
+                              }
+                           }
+                        }
+                     }
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+
+                  } else {
+                     for (beatid in reportsadmin[idarr[0]][idarr[1]]) {
+
+                        for (employeeid in reportsadmin[idarr[0]][idarr[1]][beatid]) {
+
+                           for (key in reportsadmin[idarr[0]][idarr[1]][beatid][employeeid]) {
+                              let row = $("<tr>", {
+                                 "id" : idarr[0]+"_"+idarr[1]+"_"+beatid+"_"+employeeid+"_"+key,
+                                 "class" : "tablerow-admin",
+                              });
+                              let reportidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsadmin[idarr[0]][idarr[1]][beatid][employeeid][key]["rep_id"],
+                              });
+                              let divisioncol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : idarr[0],
+                              });
+                              let rangecol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : idarr[1],
+                              });
+                              let beatscol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : beatid,
+                              });
+                              let empidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : employeeid,
+                              });
+                              let timestampcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsadmin[idarr[0]][idarr[1]][beatid][employeeid][key]["timestamp"],
+                              });
+                              row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                              tbody.append(row);
+                           }
+                        }
+                     }
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+                  }
+               } else {
+                  let id = $(this).attr("id");
+                  let idarr = $(this).attr("id").split("-");
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Range</th>");
+                  headrow.append("<th class='text-center'>Beat</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+
+                  if (idarr[1]=="all") {
+                     for (rangeid in reportsrange) {
+
+                        for (beatid in reportsrange[rangeid]) {
+
+                           for (employeeid in reportsrange[rangeid][beatid]) {
+
+                              for (id in reportsrange[rangeid][beatid][employeeid]) {
+                                 let row = $("<tr>", {
+                                    "id" : rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                                    "class" : "tablerow-admin",
+                                 });
+                                 let reportidcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : reportsrange[rangeid][beatid][employeeid][id]["rep_id"],
+                                 });
+                                 let rangecol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : rangeid,
+                                 });
+                                 let beatscol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : beatid,
+                                 });
+                                 let empidcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : employeeid,
+                                 });
+                                 let timestampcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : reportsrange[rangeid][beatid][employeeid][id]["timestamp"],
+                                 });
+                                 row.append(reportidcol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                                 tbody.append(row);
+                              }
+                           }
+                        }
+                     }
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+
+                  } else {
+                     for (beatid in reportsrange[id]) {
+
+                        for (employeeid in reportsrange[id][beatid]) {
+
+                           for (key in reportsrange[id][beatid][employeeid]) {
+                              let row = $("<tr>", {
+                                 "id" : id+"_"+beatid+"_"+employeeid+"_"+key,
+                                 "class" : "tablerow-admin",
+                              });
+                              let reportidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsrange[id][beatid][employeeid][key]["rep_id"],
+                              });
+                              let rangecol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : id,
+                              });
+                              let beatscol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : beatid,
+                              });
+                              let empidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : employeeid,
+                              });
+                              let timestampcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsrange[id][beatid][employeeid][key]["timestamp"],
+                              });
+                              row.append(reportidcol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                              tbody.append(row);
+                           }
+                        }
+                     }
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+
+                  }
+               }
+
+            });
+
+            // code for beat button dropdown
+            $(".tablefilter").on("click", ".beatbutton", function(){
+               console.log("function called");
+               $(".maincontainer").empty();
+
+               if (loginflag=="admin") {
+
+                  let mainid = $(this).attr("id");
+                  let idarr;
+                  let flag;
+                  if(mainid.includes("/")) {
+                     flag = 1;
+                     idarr = $(this).attr("id").split("/");
+                  } else {
+                     flag = 0;
+                  }
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Division</th>");
+                  headrow.append("<th class='text-center'>Range</th>");
+                  headrow.append("<th class='text-center'>Beat</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+
+                  if (flag==0) {
+                     for (divisionid in reportsadmin) {
+
+                        for (rangeid in reportsadmin[divisionid]) {
+
+                           for (beatid in reportsadmin[divisionid][rangeid]) {
+
+                              for (employeeid in reportsadmin[divisionid][rangeid][beatid]) {
+
+                                 for (id in reportsadmin[divisionid][rangeid][beatid][employeeid]) {
+                                    let row = $("<tr>", {
+                                       "id" : divisionid+"_"+rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                                       "class" : "tablerow-admin",
+                                    });
+                                    let reportidcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["rep_id"],
+                                    });
+                                    let divisioncol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : divisionid,
+                                    });
+                                    let rangecol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : rangeid,
+                                    });
+                                    let beatscol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : beatid,
+                                    });
+                                    let empidcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : employeeid,
+                                    });
+                                    let timestampcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["timestamp"],
+                                    });
+                                    row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                                    tbody.append(row);
+                                 }
+                              }
+                           }
+                        }
+                     }
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+
+                  } else {
+                     for (employeeid in reportsadmin[idarr[0]][idarr[1]][idarr[2]]) {
+                        for (key in reportsadmin[idarr[0]][idarr[1]][idarr[2]][employeeid]) {
+                           let row = $("<tr>", {
+                              "id" : idarr[0]+"_"+idarr[1]+"_"+idarr[2]+"_"+employeeid+"_"+key,
+                              "class" : "tablerow-admin",
+                           });
+                           let reportidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reportsadmin[idarr[0]][idarr[1]][idarr[2]][employeeid][key]["rep_id"],
+                           });
+                           let divisioncol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : idarr[0],
+                           });
+                           let rangecol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : idarr[1],
+                           });
+                           var beatscol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : idarr[2],
+                           });
+                           let empidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : employeeid,
+                           });
+                           let timestampcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reportsadmin[idarr[0]][idarr[1]][idarr[2]][employeeid][key]["timestamp"],
+                           });
+                           row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                           tbody.append(row);
+                        }
+                     }
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+                  }
+
+               } else if (loginflag=="division") {
+
+                  let mainid = $(this).attr("id");
+                  let idarr;
+                  let flag;
+                  if (mainid.includes("/")) {
+                     flag = 1;
+                     idarr = $(this).attr("id").split("/");
+                  } else {
+                     flag = 0;
+                  }
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Range</th>");
+                  headrow.append("<th class='text-center'>Beat</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+
+                  if (flag==0) {
+                     for (rangeid in reportsrange) {
+
+                        for (beatid in reportsrange[rangeid]) {
+
+                           for (employeeid in reportsrange[rangeid][beatid]) {
+
+                              for (id in reportsrange[rangeid][beatid][employeeid]) {
+                                 let row = $("<tr>", {
+                                    "id" : rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                                    "class" : "tablerow-range",
+                                 });
+                                 let reportidcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : reportsrange[rangeid][beatid][employeeid][id]["rep_id"],
+                                 });
+                                 let rangecol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : rangeid,
+                                 });
+                                 let beatscol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : beatid,
+                                 });
+                                 let empidcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : employeeid,
+                                 });
+                                 let timestampcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : reportsrange[rangeid][beatid][employeeid][id]["timestamp"],
+                                 });
+                                 row.append(reportidcol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                                 tbody.append(row);
+                              }
+                           }
+                        }
+                     }
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+
+                  } else {
+                     for (employeeid in reportsrange[idarr[0]][idarr[1]]) {
+                        for (key in reportsrange[idarr[0]][idarr[1]][employeeid]) {
+                           var row = $("<tr>", {
+                              "id" : idarr[0]+"_"+idarr[1]+"_"+employeeid+"_"+key,
+                              "class" : "tablerow-range",
+                           });
+                           var reportidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reportsrange[idarr[0]][idarr[1]][employeeid][key]["rep_id"],
+                           });
+                           var rangecol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : idarr[0],
+                           });
+                           var beatscol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : idarr[1],
+                           });
+                           var empidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : employeeid,
+                           });
+                           var timestampcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reportsrange[idarr[0]][idarr[1]][employeeid][key]["timestamp"],
+                           });
+                           row.append(reportidcol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                           tbody.append(row);
+                        }
+                     }
+
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+                  } 
+               } else if (loginflag=="range") {
+                  var id = $(this).attr("id");
+                  var idarr = $(this).attr("id").split("-");
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Beat</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+
+                  if (idarr[1]=="all") {
+
+                     for (beatid in reportsbeats) {
+
+                        for (employeeid in reportsbeats[beatid]) {
+
+                           for (id in reportsbeats[beatid][employeeid]) {
+                              let row = $("<tr>", {
+                                 "id" : beatid+"_"+employeeid+"_"+id,
+                                 "class" : "tablerow-range",
+                              });
+                              let reportidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsbeats[beatid][employeeid][id]["rep_id"],
+                              });
+                              let beatscol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : beatid,
+                              });
+                              let empidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : employeeid,
+                              });
+                              let timestampcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsbeats[beatid][employeeid][id]["timestamp"],
+                              });
+                              row.append(reportidcol).append(beatscol).append(empidcol).append(timestampcol);
+                              tbody.append(row);
+                           }
+                        }
+                     }
+
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+
+                  } else {
+
+                     for (employeeid in reportsbeats[id]) {
+
+                        for (key in reportsbeats[id][employeeid]) {
+                           let row = $("<tr>", {
+                              "id" : id+"_"+employeeid+"_"+key,
+                              "class" : "tablerow-range",
+                           });
+                           let reportidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reportsbeats[id][employeeid][key]["rep_id"],
+                           });
+                           let beatscol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : id,
+                           });
+                           let empidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : employeeid,
+                           });
+                           let timestampcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reportsbeats[id][employeeid][key]["timestamp"],
+                           });
+                           row.append(reportidcol).append(beatscol).append(empidcol).append(timestampcol);
+                           tbody.append(row);
+                        }
+                     }
+                     table.append(thead).append(tbody);
+                     $(".maincontainer").append(table);
+
+                  }
+               }
+
+            });
+
+            // code for employee button dropdown
+            $(".tablefilter").on("click", ".employeebutton", function(){
+               console.log("function called");
+               $(".maincontainer").empty();
+
+               if (loginflag=="admin") {
+
+                  let mainid = $(this).attr("id");
+                  let idarr;
+                  let flag;
+                  if(mainid.includes("/")) {
+                     flag = 1;
+                     idarr = $(this).attr("id").split("/");
+                  } else {
+                     flag = 0;
+                  }
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Division</th>");
+                  headrow.append("<th class='text-center'>Range</th>");
+                  headrow.append("<th class='text-center'>Beat</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+
+                  if (flag==0) {
+                     for (divisionid in reportsadmin) {
+
+                        for (rangeid in reportsadmin[divisionid]) {
+
+                           for (beatid in reportsadmin[divisionid][rangeid]) {
+
+                              for (employeeid in reportsadmin[divisionid][rangeid][beatid]) {
+
+                                 for (id in reportsadmin[divisionid][rangeid][beatid][employeeid]) {
+                                    let row = $("<tr>", {
+                                       "id" : divisionid+"_"+rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                                       "class" : "tablerow-admin",
+                                    });
+                                    let reportidcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["rep_id"],
+                                    });
+                                    let divisioncol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : divisionid,
+                                    });
+                                    let rangecol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : rangeid,
+                                    });
+                                    let beatscol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : beatid,
+                                    });
+                                    let empidcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : employeeid,
+                                    });
+                                    let timestampcol = $("<td>", {
+                                       "class" : "text-center",
+                                       "text" : reportsadmin[divisionid][rangeid][beatid][employeeid][id]["timestamp"],
+                                    });
+                                    row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                                    tbody.append(row);
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  } else {
+                     for (key in reportsadmin[idarr[0]][idarr[1]][idarr[2]][idarr[3]]) {
+                        let row = $("<tr>", {
+                           "id" : idarr[0]+"_"+idarr[1]+"_"+idarr[2]+"_"+idarr[3]+"_"+key,
+                           "class" : "tablerow-admin",
+                        });
+                        let reportidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reportsadmin[idarr[0]][idarr[1]][idarr[2]][idarr[3]][key]["rep_id"],
+                        });
+                        let divisioncol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[0],
+                        });
+                        let rangecol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[1],
+                        });
+                        var beatscol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[2],
+                        });
+                        let empidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[3],
+                        });
+                        let timestampcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reportsadmin[idarr[0]][idarr[1]][idarr[2]][idarr[3]][key]["timestamp"],
+                        });
+                        row.append(reportidcol).append(divisioncol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                        tbody.append(row);
+                     }
+                  }
+                  table.append(thead).append(tbody);
+                  $(".maincontainer").append(table);
+
+               } else if (loginflag=="division") {
+
+                  let mainid = $(this).attr("id");
+                  let idarr;
+                  let flag;
+                  if(mainid.includes("/")) {
+                     flag = 1;
+                     idarr = $(this).attr("id").split("/");
+                  } else {
+                     flag = 0;
+                  }
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Range</th>");
+                  headrow.append("<th class='text-center'>Beat</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+                  
+                  if (flag==0) {
+                     for (rangeid in reportsrange) {
+
+                        for (beatid in reportsrange[rangeid]) {
+
+                           for (employeeid in reportsrange[rangeid][beatid]) {
+
+                              for (id in reportsrange[rangeid][beatid][employeeid]) {
+
+                                 let row = $("<tr>", {
+                                    "id" : rangeid+"_"+beatid+"_"+employeeid+"_"+id,
+                                    "class" : "tablerow-admin",
+                                 });
+                                 let reportidcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : reportsrange[rangeid][beatid][employeeid][id]["rep_id"],
+                                 });
+                                 let rangecol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : rangeid,
+                                 });
+                                 let beatscol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : beatid,
+                                 });
+                                 let empidcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : employeeid,
+                                 });
+                                 let timestampcol = $("<td>", {
+                                    "class" : "text-center",
+                                    "text" : reportsrange[rangeid][beatid][employeeid][id]["timestamp"],
+                                 });
+                                 row.append(reportidcol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                                 tbody.append(row);
+                              }
+                           }
+                        }
+                     }
+                  } else {
+                     for (key in reportsrange[idarr[0]][idarr[1]][idarr[2]]) {
+
+                        let row = $("<tr>", {
+                           "id" : idarr[0]+"_"+idarr[1]+"_"+idarr[2]+"_"+key,
+                           "class" : "tablerow-admin",
+                        });
+                        let reportidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reportsrange[idarr[0]][idarr[1]][idarr[2]][key]["rep_id"],
+                        });
+                        let rangecol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[0],
+                        });
+                        let beatscol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[1],
+                        });
+                        let empidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[2],
+                        });
+                        let timestampcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reportsrange[idarr[0]][idarr[1]][idarr[2]][key]["timestamp"],
+                        });
+                        row.append(reportidcol).append(rangecol).append(beatscol).append(empidcol).append(timestampcol);
+                        tbody.append(row);
+                     }
+                  }
+
+                  table.append(thead).append(tbody);
+                  $(".maincontainer").append(table);
+               } else if (loginflag=="range") {
+
+                  let mainid = $(this).attr("id");
+                  let idarr;
+                  let flag;
+                  if(mainid.includes("/")) {
+                     flag = 1;
+                     idarr = $(this).attr("id").split("/");
+                  } else {
+                     flag = 0;
+                  }
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Beat</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+                  
+                  if (flag==0) {
+
+                     for (beatid in reportsbeats) {
+
+                        for (employeeid in reportsbeats[beatid]) {
+
+                           for (key in reportsbeats[beatid][employeeid]) {
+
+                              let row = $("<tr>", {
+                                 "id" : beatid+"_"+employeeid+"_"+id,
+                                 "class" : "tablerow-admin",
+                              });
+                              let reportidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsbeats[beatid][employeeid][id]["rep_id"],
+                              });
+                              let beatscol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : beatid,
+                              });
+                              let empidcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : employeeid,
+                              });
+                              let timestampcol = $("<td>", {
+                                 "class" : "text-center",
+                                 "text" : reportsbeats[beatid][employeeid][id]["timestamp"],
+                              });
+                              row.append(reportidcol).append(beatscol).append(empidcol).append(timestampcol);
+                              tbody.append(row);
+                           }
+                        }
+                     }
+                  } else {
+                     for (key in reportsbeats[idarr[0]][idarr[1]]) {
+
+                        let row = $("<tr>", {
+                           "id" : idarr[0]+"_"+idarr[1]+"_"+key,
+                           "class" : "tablerow-admin",
+                        });
+                        let reportidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reportsbeats[idarr[0]][idarr[1]][key]["rep_id"],
+                        });
+                        let beatscol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[0],
+                        });
+                        let empidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : idarr[1],
+                        });
+                        let timestampcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reportsbeats[idarr[0]][idarr[1]][key]["timestamp"],
+                        });
+                        row.append(reportidcol).append(beatscol).append(empidcol).append(timestampcol);
+                        tbody.append(row);
+                     }
+                  }
+
+                  table.append(thead).append(tbody);
+                  $(".maincontainer").append(table);
+               } else if (loginflag=="beat") {
+
+                  var id = $(this).attr("id");
+                  var idarr = $(this).attr("id").split("-");
+
+                  let table = $("<table>", {
+                     "class" : "table table-bordered",
+                  });
+                  let thead = $("<thead>");
+                  let headrow = $("<tr>");
+                  headrow.append("<th class='text-center'>Report No</th>");
+                  headrow.append("<th class='text-center'>Employee ID</th>");
+                  headrow.append("<th class='text-center'>Timestamp</th>");
+                  thead.append(headrow);
+                  let tbody = $("<tbody>");
+
+                  if (idarr[1]=="all") {
+                     for (employeeid in reports) {
+
+                        for (key in reports[employeeid]) {
+
+                           let row = $("<tr>", {
+                              "id" : employeeid+"_"+key,
+                              "class" : "tablerow-admin",
+                           });
+                           let reportidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reports[employeeid][key]["rep_id"],
+                           });
+                           let empidcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : employeeid,
+                           });
+                           let timestampcol = $("<td>", {
+                              "class" : "text-center",
+                              "text" : reports[employeeid][key]["timestamp"],
+                           });
+                           row.append(reportidcol).append(empidcol).append(timestampcol);
+                           tbody.append(row);
+                        }
+                     }
+                  } else {
+                     for (key in reports[id]) {
+
+                        let row = $("<tr>", {
+                           "id" : id+"_"+key,
+                           "class" : "tablerow-admin",
+                        });
+                        let reportidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reports[id][key]["rep_id"],
+                        });
+                        let empidcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : id,
+                        });
+                        let timestampcol = $("<td>", {
+                           "class" : "text-center",
+                           "text" : reports[id][key]["timestamp"],
+                        });
+                        row.append(reportidcol).append(empidcol).append(timestampcol);
+                        tbody.append(row);
+                     }
+                  }
+
+                  table.append(thead).append(tbody);
+                  $(".maincontainer").append(table);
+               }
+            });
+         });
+      </script>
+   </body>
+</html>
