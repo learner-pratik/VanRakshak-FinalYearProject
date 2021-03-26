@@ -90,3 +90,28 @@ response - {
 	"assigning_offcier" : "<officer_name>",
 	"deadline" : "<task_deadline_date>"
 }
+
+8. Camera Alert
+url = "/camera-alert"
+request - {
+	"camera_id" : "<camera_id>",
+	"type" : "<alert_type>" // hunter or animal, string
+	"animal_type" : "<animal_name>",
+	"latitude" : "<geo-latitude>",
+	"longitude" : "<geo-longitude>",
+	"timestamp" : "alert-time",
+}
+response - {
+	"status" : "<true/false>" //boolean
+}
+
+9. SOS Alert
+url - "/sos-alert"
+request - {
+	"type" : "<alert_type>",
+	"name" : "<user_name>",
+	"phone_number" : "<user_phone_number>",
+	"address" : "user_address",
+	"latitude" : "<geo-latitude>",
+	"longitude" : "<geo-longitude>",
+}
