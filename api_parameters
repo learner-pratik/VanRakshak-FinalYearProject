@@ -110,3 +110,20 @@ request - {
 response - {
 	"status" : "true/false" //boolean
 }
+
+9. Localreport 
+url - "/local_report"
+request - {
+	"user_name" : "<name>",
+	"phone_number" : "<phone_number>",
+	"address" : "<user_address>",
+	"report_name" : "<name>",
+	"type" : "<report_type>",
+	"description" : "<report_description>",
+	"latitude" : "<geo_latitude>",
+	"longitude" : "geo_longitude",
+	"image" : "<report_image>",
+}
+response - {
+	"status" : "<true/false>" //boolean
+}
