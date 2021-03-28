@@ -145,6 +145,7 @@ public class SOSActivity extends AppCompatActivity implements NavigationView.OnN
                 int r = Integer.parseInt(SaveSharedPreference.getSosAlerts(this));
                 r++;
                 SaveSharedPreference.setSosAlerts(this, Integer.toString(r));
+                startMainActivity();
             }
         }, error -> {
             error.printStackTrace();
@@ -152,6 +153,11 @@ public class SOSActivity extends AppCompatActivity implements NavigationView.OnN
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jsonObjectRequest);
+    }
+
+    private void startMainActivity() {
+        Intent mainActivityIntent = new Intent(this, MainActivity.class);
+        startActivity(mainActivityIntent);
     }
 
     @Override

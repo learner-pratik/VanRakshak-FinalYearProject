@@ -210,13 +210,7 @@ public class MainActivity extends AppCompatActivity implements
                             }
                         });
 
-
-
-
                 Log.d("ADebugTag", "Value: " + (result.getLastLocation().getLatitude()));
-
-                ;
-
 
                 // Create a Toast which displays the new location's coordinates
                 Toast.makeText(activity, String.format(activity.getString(R.string.new_location),

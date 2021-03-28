@@ -1,15 +1,21 @@
 package com.example.forestofficerapp;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.sql.Time;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Alert {
 
-    private String alertName, alertType;
+    private String alertName, alertType, sosType;
     private Date alertDate;
     private LocalTime alertTime;
     private Double alertLatitude, alertLongitude;
+    private JSONObject sosUserDetails;
 
     public Alert(){}
 
@@ -69,4 +75,20 @@ public class Alert {
     public void setAlertLongitude(Double alertLongitude) {
         this.alertLongitude = alertLongitude;
     }
+
+    public JSONObject getUserObject() { return sosUserDetails; }
+
+    public void setUserObject(String name, String phoneNumber, String address) {
+        try {
+            sosUserDetails.put("name", name);
+            sosUserDetails.put("phone", phoneNumber);
+            sosUserDetails.put("address", address);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getSosType() { return sosType; }
+
+    public void setSosType(String sosType) { this.sosType = sosType; }
 }

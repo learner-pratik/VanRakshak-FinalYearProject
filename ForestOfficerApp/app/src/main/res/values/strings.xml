@@ -42,5 +42,7 @@
 
     <string name="forest_app_bar_name">VANRAKSHAK</string>
     <string name="task_channel_name">Task Channel</string>
-    <string name="channel_description">Channel for getting task notifications</string>
+    <string name="task_channel_description">Channel for getting task notifications</string>
+    <string name="alert_channel_name">Alert Channel</string>
+    <string name="alert_channel_description">Channel for getting alert notification</string>
 </resources>

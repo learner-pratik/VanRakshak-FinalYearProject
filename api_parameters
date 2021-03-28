@@ -127,3 +127,30 @@ request - {
 response - {
 	"status" : "<true/false>" //boolean
 }
+
+10. Incomplete Tasks 
+url - "get_task"
+request - {
+	"emp_id" : "<employee_id>",
+} // request also has header with Auth Token
+response - {
+	"tasks" : [
+		{
+			"id" : "<task_id>"
+			"task_name" : "<task_name>",
+			"task_type" : "<task_type>",
+			"description : "<task_description>",
+			"assigning_offcier" : "<officer_name>",
+			"deadline" : "<task_deadline_date>"
+		},
+		{
+			"id" : "<task_id>"
+			"task_name" : "<task_name>",
+			"task_type" : "<task_type>",
+			"description : "<task_description>",
+			"assigning_offcier" : "<officer_name>",
+			"deadline" : "<task_deadline_date>"
+		}, 
+		
+	]
+} // response is json object with task key and jsonarray as value

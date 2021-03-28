@@ -27,7 +27,8 @@ public class AlertCardViewHolder extends RecyclerView.ViewHolder implements View
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+        Toast.makeText(v.getContext(), "ROW PRESSED = " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
         listenerWeakReference.get().onPositionClicked(getAdapterPosition());
     }
+
 }

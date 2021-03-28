@@ -21,12 +21,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,6 +44,7 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
 
     private final String LOG_TAG = this.getClass().getSimpleName();
     public static List<Task> taskList = new ArrayList<>();
+    public static final String taskURL = "/task_api/";
 
     private MaterialToolbar topAppBar;
     private DrawerLayout drawerLayout;
@@ -59,6 +67,8 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+        getTasksToBeCompleted();
+
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -70,6 +80,63 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
         });
         recyclerView.setAdapter(adapter);
 
+    }
+
+    private void getTasksToBeCompleted() {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("request", "task");
+            jsonObject.put("empid", SaveSharedPreference.getEmployeeID(this));
+            jsonObject.put("name", SaveSharedPreference.getName(this));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String url = LoginOptionActivity.BASE_URL+taskURL;
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, jsonObject, response -> {
+
+            try {
+
+                JSONArray jsonArray = response.getJSONArray("tasks");
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+
+                    JSONObject taskObject = jsonArray.getJSONObject(i);
+                    Task task = new Task();
+
+                    task.setTaskID(taskObject.getString("id"));
+                    task.setTaskType(taskObject.getString("task_type"));
+                    task.setTaskName(taskObject.getString("task_name"));
+                    task.setTaskDescription(taskObject.getString("description"));
+                    task.setAssignedBy(taskObject.getString("assigning_officer"));
+                    Date date = new SimpleDateFormat("dd/mm/yyyy").parse(taskObject.getString("deadline"));
+                    task.setTaskDeadline(date);
+
+                    taskList.add(task);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }, error -> {
+            Log.d(LOG_TAG, "response not received");
+            error.printStackTrace();
+        }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 
     @Override
