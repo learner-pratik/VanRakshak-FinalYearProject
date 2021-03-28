@@ -1,10 +1,13 @@
 package com.example.forestofficerapp;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -28,6 +31,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
@@ -46,10 +51,12 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     private final String LOG_TAG = this.getClass().getSimpleName();
     private static final String taskURL = "/taskreport/";
 
+    private static final int PERMISSIONS_REQUEST = 1;
+    private static final String PERMISSION_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
     private Bitmap photo;
-    private static final int MY_CAMERA_PERMISSION_CODE = 100;
 
     private MaterialToolbar topAppBar;
     private DrawerLayout drawerLayout;
@@ -61,11 +68,15 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     private Task task;
     private int taskIndex;
     private String writtenReport;
+    private Double latitude, longitude;
+    private FusedLocationProviderClient fusedLocationClient;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_page);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         topAppBar = findViewById(R.id.topAppbar);
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -98,8 +109,15 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         String deadlineDate = dateFormat.format(task.getTaskDeadline());
         taskDeadline.setText(deadlineDate);
 
+        if (hasPermission()) {
+            getCurrentLocation();
+        } else {
+            requestPermission();
+        }
+
         taskCameraButton.setOnClickListener(v -> {
             writtenReport = taskReport.getEditText().getText().toString();
+            SaveSharedPreference.setTaskReport(this, writtenReport);
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
         });
@@ -113,23 +131,24 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void goToTaskList() {
-        Intent taskListActivityIntent = new Intent(this, TaskListActivity.class);
-        startActivity(taskListActivityIntent);
-    }
-
     private void sendTaskReport() {
 
         progressBar.setVisibility(View.VISIBLE);
         progressMessage.setVisibility(View.VISIBLE);
 
+        String geoLatitude, geoLongitude;
+        if (latitude==null) {
+            geoLatitude = "19.725894";
+            geoLongitude = "72.321456";
+        } else {
+            geoLatitude = Double.toString(latitude);
+            geoLongitude = Double.toString(longitude);
+        }
         String url = LoginOptionActivity.BASE_URL+taskURL;
         String reportData = taskReport.getEditText().getText().toString();
-        String geoLatitude = String.valueOf(MainActivity.currentLocation.getLatitude());
-        String geoLongitude = String.valueOf(MainActivity.currentLocation.getLongitude());
 
         JSONObject jsonObject = new JSONObject();
-        String taskID = String.valueOf(this.task.getTaskID());
+        String taskID = task.getTaskID();
         try {
             jsonObject.put("email", SaveSharedPreference.getEmail(this));
             jsonObject.put("taskID", taskID);
@@ -170,18 +189,19 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         requestQueue.add(jsonObjectRequest);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == MY_CAMERA_PERMISSION_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_REQUEST);
-            } else {
-                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
-            }
-        }
+    private void refreshTaskPage() {
+        progressMessage.setText("REPORT SENT");
+        TaskListActivity.taskList.remove(taskIndex);
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            progressMessage.setVisibility(View.INVISIBLE);
+            goToTaskList();
+        }, 1000);
+    }
+
+    private void goToTaskList() {
+        Intent taskListActivityIntent = new Intent(this, TaskListActivity.class);
+        startActivity(taskListActivityIntent);
     }
 
     @Override
@@ -190,8 +210,65 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
-            taskReport.getEditText().setText(writtenReport);
+            taskReport.getEditText().setText(SaveSharedPreference.getTaskReport(this));
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            final int requestCode, final String[] permissions, final int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSIONS_REQUEST) {
+            if (allPermissionsGranted(grantResults)) {
+                getCurrentLocation();
+            } else {
+                requestPermission();
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getCurrentLocation() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+                Log.d(LOG_TAG, String.valueOf(latitude));
+                Log.d(LOG_TAG, String.valueOf(longitude));
+            }
+        });
+    }
+
+    private boolean hasPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return checkSelfPermission(PERMISSION_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return true;
+        }
+    }
+
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (shouldShowRequestPermissionRationale(PERMISSION_LOCATION)) {
+                Toast.makeText(
+                        this,
+                        "Location permission is required for this demo",
+                        Toast.LENGTH_LONG)
+                        .show();
+            }
+            requestPermissions(new String[] {PERMISSION_LOCATION}, PERMISSIONS_REQUEST);
+        }
+    }
+
+    private static boolean allPermissionsGranted(final int[] grantResults) {
+        for (int result : grantResults) {
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -270,17 +347,13 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setNavigationViewListener() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        TextView name = headerView.findViewById(R.id.personName);
+        TextView designation = headerView.findViewById(R.id.personDesignation);
+        name.setText(SaveSharedPreference.getName(this));
+        designation.setText(SaveSharedPreference.getDesignation(this));
         navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    private void refreshTaskPage() {
-        progressMessage.setText("REPORT SENT");
-        Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            progressMessage.setVisibility(View.INVISIBLE);
-            goToTaskList();
-        }, 1000);
     }
 
 }

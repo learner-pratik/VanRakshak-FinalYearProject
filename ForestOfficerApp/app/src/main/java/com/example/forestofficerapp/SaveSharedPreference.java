@@ -17,6 +17,11 @@ public class SaveSharedPreference {
     static final String divisionKey = "PASSWORD";
     static final String employeeIdKey = "EMPLOYEE_ID";
     static final String authTokenKey = "TOKEN";
+    static final String forestServiceKey = "FOREST-SERVICE";
+    static final String messageKey = "MEESAGE";
+    static final String reportNameKey = "REPORT-NAME";
+    static final String reportDescriptionKey = "REPORT-DESCRIPTION";
+    static final String taskReportKey = "TASK-REPORT";
 
     static SharedPreferences getSharedPreferences(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -76,6 +81,30 @@ public class SaveSharedPreference {
         editor.commit();
     }
 
+    public static void setServiceFlag(Context ctx, Boolean flag) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putBoolean(forestServiceKey, flag);
+        editor.commit();
+    }
+
+    public static void setReportName(Context ctx, String name) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(reportNameKey, name);
+        editor.commit();
+    }
+
+    public static void setReportDescription(Context ctx, String description) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(reportDescriptionKey, description);
+        editor.commit();
+    }
+
+    public static void setTaskReport(Context ctx, String report) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(taskReportKey, report);
+        editor.commit();
+    }
+
     public static String getEmail(Context ctx) {
         return getSharedPreferences(ctx).getString(emailKey, "");
     }
@@ -110,6 +139,26 @@ public class SaveSharedPreference {
 
     public static String getAuthToken(Context ctx) {
         return getSharedPreferences(ctx).getString(authTokenKey, "");
+    }
+
+    public static Boolean getServiceFlag(Context ctx) {
+        return getSharedPreferences(ctx).getBoolean(forestServiceKey, false);
+    }
+
+    public static String getMessageList(Context ctx) {
+        return getSharedPreferences(ctx).getString(messageKey, "");
+    }
+
+    public static String getReportName(Context ctx) {
+        return getSharedPreferences(ctx).getString(reportNameKey, "");
+    }
+
+    public static String getReportDescription(Context ctx) {
+        return getSharedPreferences(ctx).getString(reportDescriptionKey, "");
+    }
+
+    public static String getTaskReport(Context ctx) {
+        return getSharedPreferences(ctx).getString(taskReportKey, "");
     }
 
     public static void clearPreferences(Context ctx) {

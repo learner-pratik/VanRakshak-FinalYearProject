@@ -11,6 +11,8 @@ public class Alert {
     private LocalTime alertTime;
     private Double alertLatitude, alertLongitude;
 
+    public Alert(){}
+
     public Alert(String alertName, String alertType, Date alertDate, LocalTime alertTime, Double alertLatitude, Double alertLongitude) {
         this.alertName = alertName;
         this.alertType = alertType;

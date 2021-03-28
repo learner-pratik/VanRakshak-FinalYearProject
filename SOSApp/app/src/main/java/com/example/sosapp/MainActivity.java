@@ -7,7 +7,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
@@ -39,6 +42,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+        String phoneNumber = SaveSharedPreference.getPhoneNumber(this);
+        String finalPhoneNumber = "+"+phoneNumber.substring(0, 2)+
+                "-"+phoneNumber.substring(2, 5)+"-"+phoneNumber.substring(5, 8)+"-"+phoneNumber.substring(8);
+        String name = SaveSharedPreference.getFirstName(this)+" "+SaveSharedPreference.getLastName(this);
+
+        userName.setText(name);
+        userPhoneNumber.setText(finalPhoneNumber);
+        userAddress.setText(SaveSharedPreference.getAddress(this));
+        userReports.setText(SaveSharedPreference.getSubmittedReports(this));
+        userAlerts.setText(SaveSharedPreference.getSosAlerts(this));
     }
 
     @Override
@@ -64,12 +77,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             }
         }
-        drawerLayout.closeDrawer(0);
+        drawerLayout.closeDrawer(Gravity.LEFT);
         return true;
     }
 
     private void setNavigationViewListener() {
         NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        TextView userName = headerView.findViewById(R.id.personName);
+        String name = SaveSharedPreference.getFirstName(this)+" "+SaveSharedPreference.getLastName(this);
+        userName.setText(name);
         navigationView.setNavigationItemSelectedListener(this);
     }
 }

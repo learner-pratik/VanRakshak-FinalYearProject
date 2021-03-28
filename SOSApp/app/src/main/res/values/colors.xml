@@ -14,4 +14,5 @@
     <color name="textColorPrimary">#003D00</color>
     <color name="textInputOutlineColor">#00B248</color>
     <color name="loginPageBackgroundColor">#FFFFFF</color>
+    <color name="sosButtonColor">#EC0404</color>
 </resources>

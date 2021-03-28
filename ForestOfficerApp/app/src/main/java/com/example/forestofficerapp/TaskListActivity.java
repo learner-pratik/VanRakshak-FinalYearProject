@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,12 +46,6 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
     private RecyclerView.Adapter adapter;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        addTasks();
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_list);
@@ -74,29 +70,6 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
         });
         recyclerView.setAdapter(adapter);
 
-    }
-
-    private void addTasks() {
-        for (int i=0; i<10; i++) {
-            Task task1 = new Task(
-                    1,
-                    "Animal",
-                    "Count elephants",
-                    "Only Asian elephants",
-                    "Ravi Nalawade",
-                    new Date()
-            );
-            Task task2 = new Task(
-                    2,
-                    "Animal",
-                    "Feed monkeys",
-                    "African monkeys",
-                    "Ravi Nalawade",
-                    new Date()
-            );
-            if (i%2==0) taskList.add(task1);
-            else taskList.add(task2);
-        }
     }
 
     @Override
@@ -175,7 +148,12 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
     }
 
     private void setNavigationViewListener() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        TextView name = headerView.findViewById(R.id.personName);
+        TextView designation = headerView.findViewById(R.id.personDesignation);
+        name.setText(SaveSharedPreference.getName(this));
+        designation.setText(SaveSharedPreference.getDesignation(this));
         navigationView.setNavigationItemSelectedListener(this);
     }
 

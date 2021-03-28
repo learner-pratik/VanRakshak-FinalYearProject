@@ -3,6 +3,7 @@ package com.example.forestofficerapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -22,9 +23,11 @@ public class LoginOptionActivity extends Activity {
         Button registerButton = findViewById(R.id.registerButton);
         Button loginButton = findViewById(R.id.loginButton);
 
-        if (!ForestService.isForestServiceRunning) {
+        System.out.println(SaveSharedPreference.getServiceFlag(this));
+        if (!SaveSharedPreference.getServiceFlag(this)) {
             Intent serviceIntent = new Intent(this, ForestService.class);
-            startService(serviceIntent);
+            Handler handler = new Handler();
+            handler.post(() -> startService(serviceIntent));
         }
 
         String loginEmail = SaveSharedPreference.getEmail(this);

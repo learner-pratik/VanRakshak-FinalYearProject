@@ -40,43 +40,37 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:padding="15dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/person_logo"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginBottom="20dp">
+                    android:padding="15dp"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"
-                        android:padding="15dp"
-                        android:background="@drawable/person_logo"/>
-
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/profileOfficerName"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+                        android:textColor="@color/colorPrimaryDark"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:orientation="vertical">
+                        android:text="Officer Name"/>
 
-                        <TextView
-                            android:id="@+id/profileOfficerName"
-                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
-                            android:textColor="@color/colorPrimaryDark"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Officer Name"/>
-
-                        <TextView
-                            android:id="@+id/profileOfficerEmail"
-                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Officer Email"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                    <TextView
+                        android:id="@+id/profileOfficerEmail"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Officer Email"/>
+                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"

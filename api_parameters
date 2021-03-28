@@ -85,10 +85,10 @@ response - {
 
 7. task
 response - {
-	"response_type" : "task",
+	"type" : "task",
 	"id" : "<task_id>"
-	"name" : "<task_name>",
-	"type" : "<task_type>",
+	"task_name" : "<task_name>",
+	"task_type" : "<task_type>",
 	"description : "<task_description>",
 	"assigning_offcier" : "<officer_name>",
 	"deadline" : "<task_deadline_date>"

@@ -88,9 +88,11 @@ public abstract class CameraActivity extends AppCompatActivity
   private static final Logger LOGGER = new Logger();
 
   private static final int PERMISSIONS_REQUEST = 1;
-
   private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
   private static final String PERMISSION_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+
+  public static final String CAMERA_ID = "c-100";
+  public static final String URL = "https://vanrakshak.herokuapp.com/alert_api/";
   private static final String TAG = "CameraActivity";
   protected int previewWidth = 0;
   protected int previewHeight = 0;
@@ -115,24 +117,8 @@ public abstract class CameraActivity extends AppCompatActivity
   private SwitchCompat apiSwitchCompat;
   private TextView threadsTextView;
 
-  private BroadcastReceiver receiver;
-  private WifiManager manager;
-  private IntentFilter filter;
-  public MqttActivity mqttActivity;
-
   public static double latitude;
   public static double longitude;
-
-  FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-  public static String camera_alert_id;
-  public static double camera_alert_latitude;
-  public static double camera_alert_longitude;
-  public static String camera_alert_timestamp;
-
-  ObjectMapper objectMapper = new ObjectMapper();
-  public static String animal_types;
-  public static String animal_locations;
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
@@ -153,8 +139,7 @@ public abstract class CameraActivity extends AppCompatActivity
       requestPermission();
     }
 
-    startService(new Intent(getBaseContext(), ServiceMqtt.class));
-    startService(new Intent(getBaseContext(), CameraMqttService.class));
+    startService(new Intent(this, CameraService.class));
 
     threadsTextView = findViewById(R.id.threads);
     plusImageView = findViewById(R.id.plus);
@@ -385,88 +370,12 @@ public abstract class CameraActivity extends AppCompatActivity
   }
 
   @Override
-  public synchronized void onStart() {
-    LOGGER.d("onStart " + this);
-    super.onStart();
-
-    db.collection("camera").document("status").addSnapshotListener(new EventListener<DocumentSnapshot>() {
-      @Override
-      public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-        if (e != null) {
-          Log.d(TAG, e.toString());
-          return;
-        }
-        if (documentSnapshot.exists()) {
-          Log.d(TAG, "method called");
-          Map<String, Object> camera_id = documentSnapshot.getData();
-          if (!camera_id.isEmpty()) {
-            camera_alert_id = camera_id.get("camera_id").toString();
-            camera_alert_latitude = Double.parseDouble(camera_id.get("latitude").toString());
-            camera_alert_longitude = Double.parseDouble(camera_id.get("longitude").toString());
-            camera_alert_timestamp = camera_id.get("time").toString();
-//          Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//          camera_alert_timestamp =timestamp.toString();
-            MqttActivity activity = new MqttActivity(getApplicationContext(), "camera");
-            activity.setPriority(Thread.MAX_PRIORITY);
-            activity.start();
-          }
-        }
-      }
-    });
-
-    db.collection("map_alert").document("animal").addSnapshotListener(new EventListener<DocumentSnapshot>() {
-      @Override
-      public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
-        if (error != null) {
-          Log.d(TAG, error.toString());
-          return;
-        }
-        if (documentSnapshot.exists()) {
-          Log.d(TAG, "animal document listener activated");
-          Map<String, Object> animalsDocument = documentSnapshot.getData();
-          try {
-            animal_types = objectMapper.writeValueAsString(animalsDocument);
-            System.out.println(animal_types);
-          } catch (JsonProcessingException e) {
-            e.printStackTrace();
-          }
-          MqttActivity activity = new MqttActivity(getApplicationContext(), "mapalert-animals");
-          activity.setPriority(Thread.MAX_PRIORITY);
-          activity.start();
-        }
-      }
-    });
-
-    db.collection("map_alert").document("location").addSnapshotListener(new EventListener<DocumentSnapshot>() {
-      @Override
-      public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
-        if (error != null) {
-          Log.d(TAG, error.toString());
-          return;
-        }
-        if (documentSnapshot.exists()) {
-          Log.d(TAG, "location document listener activated");
-          Map<String, Object> locationDocument = documentSnapshot.getData();
-          try {
-            animal_locations = objectMapper.writeValueAsString(locationDocument);
-            System.out.println(animal_locations);
-          } catch (JsonProcessingException e) {
-            e.printStackTrace();
-          }
-          MqttActivity activity = new MqttActivity(getApplicationContext(), "mapalert-locations");
-          activity.setPriority(Thread.MAX_PRIORITY);
-          activity.start();
-        }
-      }
-    });
-  }
-
-  @Override
   public synchronized void onResume() {
     LOGGER.d("onResume " + this);
     super.onResume();
 
-//    mqttActivity.establishMqttConnection();
+    startService(new Intent(this, CameraService.class));
+
     handlerThread = new HandlerThread("inference");
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
@@ -476,6 +385,8 @@ public abstract class CameraActivity extends AppCompatActivity
   public synchronized void onPause() {
     LOGGER.d("onPause " + this);
 
+    stopService(new Intent(this, CameraService.class));
+
     handlerThread.quitSafely();
     try {
       handlerThread.join();
@@ -484,15 +395,12 @@ public abstract class CameraActivity extends AppCompatActivity
     } catch (final InterruptedException e) {
       LOGGER.e(e, "Exception!");
     }
-//    mqttActivity.closeMqttConnection();
-
     super.onPause();
   }
 
   @Override
   public synchronized void onStop() {
     LOGGER.d("onStop " + this);
-//    mqttActivity.closeMqttConnection();
     super.onStop();
   }
 

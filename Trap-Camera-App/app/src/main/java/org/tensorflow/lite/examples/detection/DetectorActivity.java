@@ -28,12 +28,25 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.tensorflow.lite.examples.detection.customview.OverlayView;
 import org.tensorflow.lite.examples.detection.customview.OverlayView.DrawCallback;
 import org.tensorflow.lite.examples.detection.env.BorderedText;
@@ -50,6 +63,7 @@ import org.tensorflow.lite.examples.detection.tracking.MultiBoxTracker;
 public class DetectorActivity extends CameraActivity implements OnImageAvailableListener {
   private static final Logger LOGGER = new Logger();
 
+  private final String LOG_TAG = this.getClass().getSimpleName();
   // Configuration values for the prepackaged SSD model.
   private static final int TF_OD_API_INPUT_SIZE = 300;
 //  private static final boolean TF_OD_API_IS_QUANTIZED = true;
@@ -85,6 +99,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private MultiBoxTracker tracker;
 
   private BorderedText borderedText;
+
+  private RequestQueue requestQueue;
 
 //  public static int flag = 0;
   public static String message = null;
@@ -212,9 +228,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                 cropToFrameTransform.mapRect(location);
 
-//                MqttActivity mqttActivity = new MqttActivity(getApplicationContext(), result.getTitle());
-//                mqttActivity.setPriority(Thread.MAX_PRIORITY);
-//                mqttActivity.start();
+                if (result.getTitle().equals("Person")) sendAlert(result);
 
                 result.setLocation(location);
                 mappedRecognitions.add(result);
@@ -237,6 +251,54 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 });
           }
         });
+  }
+
+  private void sendAlert(Classifier.Recognition result) {
+
+    Log.d(LOG_TAG, "Called the alert method");
+
+    String title = result.getTitle();
+    JSONObject jsonObject = new JSONObject();
+
+    try {
+      jsonObject.put("type", "hunter");
+      jsonObject.put("camera_id", CAMERA_ID);
+
+      Log.d(LOG_TAG, "Latitude: "+ latitude);
+      Log.d(LOG_TAG, "Longitude: "+ longitude);
+
+      jsonObject.put("latitude", String.valueOf(latitude));
+      jsonObject.put("longitude", String.valueOf(longitude));
+
+      Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+      jsonObject.put("timestamp", timestamp.toString());
+
+      jsonObject.put("sos_type", "");
+      jsonObject.put("name", "");
+      jsonObject.put("phone_number", "");
+      jsonObject.put("address", "");
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+            URL, jsonObject, response -> {
+      Boolean status = false;
+      try {
+        status = response.getBoolean("status");
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+
+      if (status) Log.d(LOG_TAG, "Alert post request successful");
+
+    }, error -> {
+      error.printStackTrace();
+    });
+
+    requestQueue = Volley.newRequestQueue(this);
+    requestQueue.add(jsonObjectRequest);
   }
 
   @Override
@@ -264,4 +326,5 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   protected void setNumThreads(final int numThreads) {
     runInBackground(() -> detector.setNumThreads(numThreads));
   }
+
 }
