@@ -82,7 +82,7 @@ public class ReportListActivity extends AppCompatActivity implements AdapterView
 
         button.setOnClickListener(v -> {
             Intent intent= new Intent(ReportListActivity.this,ReportActivity.class);
-            intent.putExtra("data",String.valueOf(spinner.getSelectedItem()));
+            intent.putExtra("type",String.valueOf(spinner.getSelectedItem()));
             startActivity(intent);
         });
     }

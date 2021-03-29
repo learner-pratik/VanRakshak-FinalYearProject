@@ -146,11 +146,12 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         }
         String url = LoginOptionActivity.BASE_URL+taskURL;
         String reportData = taskReport.getEditText().getText().toString();
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
 
         JSONObject jsonObject = new JSONObject();
         String taskID = task.getTaskID();
         try {
-            jsonObject.put("email", SaveSharedPreference.getEmail(this));
+            jsonObject.put("empid", SaveSharedPreference.getEmployeeID(this));
             jsonObject.put("taskID", taskID);
             jsonObject.put("report", reportData);
             jsonObject.put("latitude", geoLatitude);
@@ -183,7 +184,14 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         }, error -> {
             Log.d(LOG_TAG, "post request failed");
             error.printStackTrace();
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(jsonObjectRequest);
@@ -191,7 +199,6 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
 
     private void refreshTaskPage() {
         progressMessage.setText("REPORT SENT");
-        TaskListActivity.taskList.remove(taskIndex);
         Handler handler = new Handler();
         handler.postDelayed(() -> {
             progressMessage.setVisibility(View.INVISIBLE);

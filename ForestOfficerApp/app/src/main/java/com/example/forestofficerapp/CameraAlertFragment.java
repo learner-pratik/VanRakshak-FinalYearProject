@@ -41,9 +41,19 @@ public class CameraAlertFragment extends Fragment {
         layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new AlertCardRecyclerViewAdapter(cameraAlertList, position -> {
-            Intent mapActivityIntent = new Intent(view.getContext(), MapActivity.class);
-            startActivity(mapActivityIntent);
+        adapter = new AlertCardRecyclerViewAdapter(cameraAlertList, new ClickListener() {
+            @Override
+            public void onPositionClicked(int position) {
+                Intent mapActivityIntent = new Intent(view.getContext(), MapActivity.class);
+                startActivity(mapActivityIntent);
+            }
+
+            @Override
+            public void onLongClicked(int position) {
+                Intent reportIntent = new Intent(view.getContext(), ReportActivity.class);
+                reportIntent.putExtra("type", "Alert Report");
+                startActivity(reportIntent);
+            }
         });
 
         recyclerView.setAdapter(adapter);

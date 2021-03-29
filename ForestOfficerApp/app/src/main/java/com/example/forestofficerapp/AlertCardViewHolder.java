@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.lang.ref.WeakReference;
 
-public class AlertCardViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class AlertCardViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
     public TextView alertName, alertDate, alertTime;
     private WeakReference<ClickListener> listenerWeakReference;
@@ -23,6 +23,7 @@ public class AlertCardViewHolder extends RecyclerView.ViewHolder implements View
         alertDate = itemView.findViewById(R.id.alertCardDateName);
         alertTime = itemView.findViewById(R.id.alertCardTimeName);
         itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
     }
 
     @Override
@@ -31,4 +32,10 @@ public class AlertCardViewHolder extends RecyclerView.ViewHolder implements View
         listenerWeakReference.get().onPositionClicked(getAdapterPosition());
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        Toast.makeText(v.getContext(), "ROW PRESSED = " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+        listenerWeakReference.get().onLongClicked(getAdapterPosition());
+        return true;
+    }
 }

@@ -63,7 +63,6 @@ public class AlertListActivity extends AppCompatActivity implements NavigationVi
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         setUpTabIcons();
-
     }
 
     private void setUpTabIcons() {

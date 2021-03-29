@@ -1,19 +1,14 @@
 package com.example.gps;
+
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-// Classes needed to initialize the map
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -46,7 +41,6 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode;
  * Use the Mapbox Core Library to listen to device location updates
  */
 
-
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, PermissionsListener {
     // Variables needed to initialize a map
@@ -65,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        startService(new Intent(this, LocationService.class));
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
@@ -189,26 +184,10 @@ public class MainActivity extends AppCompatActivity implements
                 if (location == null) {
                     return;
                 }
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                List<Object> lonlat = new ArrayList<Object>(
-                        Arrays.asList(result.getLastLocation().getLatitude(),result.getLastLocation().getLongitude())
-                );
-                user.put("id_1",lonlat);
 
-                db.collection("animals").document("location")
-                        .set(user)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("tag", "DocumentSnapshot successfully written!");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("tag", "Error writing document", e);
-                            }
-                        });
+                String myLatitude = String.valueOf(location.getLongitude());
+                String myLongitude = String.valueOf(location.getLongitude());
+                LocationService.connection.sendMessage("Location : "+myLatitude+" "+myLongitude);
 
                 Log.d("ADebugTag", "Value: " + (result.getLastLocation().getLatitude()));
 

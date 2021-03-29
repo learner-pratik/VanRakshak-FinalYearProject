@@ -68,22 +68,11 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
         drawerToggle.syncState();
 
         getTasksToBeCompleted();
-
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new TaskCardRecyclerViewAdapter(taskList, position -> {
-            Intent taskPage = new Intent(TaskListActivity.this, TaskActivity.class);
-            taskPage.putExtra("taskIndex", position);
-            startActivity(taskPage);
-        });
-        recyclerView.setAdapter(adapter);
-
     }
 
     private void getTasksToBeCompleted() {
 
+        taskList.clear();
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("request", "task");
@@ -99,7 +88,7 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
                 url, jsonObject, response -> {
 
             try {
-
+                Log.d(LOG_TAG, response.toString());
                 JSONArray jsonArray = response.getJSONArray("tasks");
 
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -112,11 +101,32 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
                     task.setTaskName(taskObject.getString("task_name"));
                     task.setTaskDescription(taskObject.getString("description"));
                     task.setAssignedBy(taskObject.getString("assigning_officer"));
-                    Date date = new SimpleDateFormat("dd/mm/yyyy").parse(taskObject.getString("deadline"));
+                    Date date = new SimpleDateFormat("yyyy-mm-dd").parse(taskObject.getString("deadline"));
                     task.setTaskDeadline(date);
 
                     taskList.add(task);
                 }
+
+                recyclerView = findViewById(R.id.recycler_view);
+                recyclerView.setHasFixedSize(true);
+                layoutManager = new LinearLayoutManager(this);
+                recyclerView.setLayoutManager(layoutManager);
+                adapter = new TaskCardRecyclerViewAdapter(taskList, new ClickListener() {
+                    @Override
+                    public void onPositionClicked(int position) {
+                        Intent taskPage = new Intent(TaskListActivity.this, TaskActivity.class);
+                        taskPage.putExtra("taskIndex", position);
+                        startActivity(taskPage);
+                    }
+
+                    @Override
+                    public void onLongClicked(int position) {
+                        Intent reportIntent = new Intent(TaskListActivity.this, ReportActivity.class);
+                        reportIntent.putExtra("type", "Alert Report");
+                        startActivity(reportIntent);
+                    }
+                });
+                recyclerView.setAdapter(adapter);
 
             } catch (JSONException e) {
                 e.printStackTrace();

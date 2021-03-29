@@ -90,7 +90,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         TextView textView = findViewById(R.id.txt_bundle);
         imageView = findViewById(R.id.picture_taken);
         Bundle bundle = getIntent().getExtras();
-        reportType = bundle.get("data").toString();
+        reportType = bundle.get("type").toString();
         textView.setText(reportType);
 
         reportDescription = findViewById(R.id.report_description);

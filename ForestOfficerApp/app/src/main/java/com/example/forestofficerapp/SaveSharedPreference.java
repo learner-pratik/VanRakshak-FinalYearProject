@@ -18,7 +18,7 @@ public class SaveSharedPreference {
     static final String employeeIdKey = "EMPLOYEE_ID";
     static final String authTokenKey = "TOKEN";
     static final String forestServiceKey = "FOREST-SERVICE";
-    static final String messageKey = "MEESAGE";
+    static final String messageKey = "MESSAGE";
     static final String reportNameKey = "REPORT-NAME";
     static final String reportDescriptionKey = "REPORT-DESCRIPTION";
     static final String taskReportKey = "TASK-REPORT";

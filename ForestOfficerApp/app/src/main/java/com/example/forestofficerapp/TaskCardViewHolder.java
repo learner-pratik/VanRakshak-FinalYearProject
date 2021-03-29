@@ -11,7 +11,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.lang.ref.WeakReference;
 
-public class TaskCardViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class TaskCardViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
     public TextView taskName, typeName, deadline;
     public FloatingActionButton actionButton;
@@ -28,6 +28,7 @@ public class TaskCardViewHolder extends RecyclerView.ViewHolder implements View.
         actionButton = itemView.findViewById(R.id.openTaskButton);
 
         actionButton.setOnClickListener(this);
+        actionButton.setOnClickListener(this);
     }
 
     @Override
@@ -39,5 +40,17 @@ public class TaskCardViewHolder extends RecyclerView.ViewHolder implements View.
         }
 
         listenerRef.get().onPositionClicked(getAdapterPosition());
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        if (v.getId() == actionButton.getId()) {
+            Toast.makeText(v.getContext(), "BUTTON PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_LONG).show();
+        }
+
+        listenerRef.get().onLongClicked(getAdapterPosition());
+        return true;
     }
 }

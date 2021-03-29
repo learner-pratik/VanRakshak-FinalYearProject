@@ -92,6 +92,7 @@ public abstract class CameraActivity extends AppCompatActivity
   private static final String PERMISSION_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
 
   public static final String CAMERA_ID = "c-100";
+  private final String LOG_TAG = this.getClass().getSimpleName();
   public static final String URL = "https://vanrakshak.herokuapp.com/alert_api/";
   private static final String TAG = "CameraActivity";
   protected int previewWidth = 0;
@@ -130,7 +131,6 @@ public abstract class CameraActivity extends AppCompatActivity
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
-
 
     if (hasPermission()) {
       setFragment();
@@ -409,6 +409,7 @@ public abstract class CameraActivity extends AppCompatActivity
   public synchronized void onDestroy() {
     LOGGER.d("onDestroy " + this);
     super.onDestroy();
+    stopService(new Intent(this, CameraService.class));
   }
 
   protected synchronized void runInBackground(final Runnable r) {

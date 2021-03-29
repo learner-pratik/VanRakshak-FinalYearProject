@@ -27,6 +27,7 @@ import android.graphics.Paint.Style;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.Size;
@@ -101,6 +102,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private BorderedText borderedText;
 
   private RequestQueue requestQueue;
+  public static Classifier.Recognition finalResult;
 
 //  public static int flag = 0;
   public static String message = null;
@@ -228,7 +230,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                 cropToFrameTransform.mapRect(location);
 
-                if (result.getTitle().equals("Person")) sendAlert(result);
+                if (result.getTitle().equals("Person")) sendAlert();
 
                 result.setLocation(location);
                 mappedRecognitions.add(result);
@@ -253,22 +255,21 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         });
   }
 
-  private void sendAlert(Classifier.Recognition result) {
-
+  private void sendAlert() {
     Log.d(LOG_TAG, "Called the alert method");
 
-    String title = result.getTitle();
+//        String title = DetectorActivity.finalResult.getTitle();
     JSONObject jsonObject = new JSONObject();
 
     try {
       jsonObject.put("type", "hunter");
-      jsonObject.put("camera_id", CAMERA_ID);
+      jsonObject.put("camera_id", CameraActivity.CAMERA_ID);
 
-      Log.d(LOG_TAG, "Latitude: "+ latitude);
-      Log.d(LOG_TAG, "Longitude: "+ longitude);
+      Log.d(LOG_TAG, "Latitude: "+ CameraActivity.latitude);
+      Log.d(LOG_TAG, "Longitude: "+ CameraActivity.longitude);
 
-      jsonObject.put("latitude", String.valueOf(latitude));
-      jsonObject.put("longitude", String.valueOf(longitude));
+      jsonObject.put("latitude", String.valueOf(CameraActivity.latitude));
+      jsonObject.put("longitude", String.valueOf(CameraActivity.longitude));
 
       Timestamp timestamp = new Timestamp(System.currentTimeMillis());
       jsonObject.put("timestamp", timestamp.toString());
@@ -291,7 +292,9 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         e.printStackTrace();
       }
 
-      if (status) Log.d(LOG_TAG, "Alert post request successful");
+      if (status) {
+        Log.d(LOG_TAG, "Alert post request successful");
+      }
 
     }, error -> {
       error.printStackTrace();

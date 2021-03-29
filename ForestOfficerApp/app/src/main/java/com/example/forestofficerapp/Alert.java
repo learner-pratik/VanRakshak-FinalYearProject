@@ -79,6 +79,7 @@ public class Alert {
     public JSONObject getUserObject() { return sosUserDetails; }
 
     public void setUserObject(String name, String phoneNumber, String address) {
+        sosUserDetails = new JSONObject();
         try {
             sosUserDetails.put("name", name);
             sosUserDetails.put("phone", phoneNumber);

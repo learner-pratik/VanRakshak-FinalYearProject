@@ -7,6 +7,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -58,10 +60,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView name, email, designation, beat, range, division, headerOfficerName, headerOfficerDesignation;
     public static final String logoutURL = "/logout/";
 
+    Intent forestServiceIntent;
+    private ForestService forestService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        forestService = new ForestService();
+        forestServiceIntent = new Intent(this, forestService.getClass());
+        if (!isMyServiceRunning(forestServiceIntent.getClass())) {
+            startService(forestServiceIntent);
+        }
 
         topAppBar = findViewById(R.id.topAppbar);
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -80,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
-        System.out.println(SaveSharedPreference.getMessageList(this));
-
         name.setText(SaveSharedPreference.getName(this));
         email.setText(SaveSharedPreference.getEmail(this));
         designation.setText(SaveSharedPreference.getDesignation(this));
@@ -89,6 +98,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         range.setText(SaveSharedPreference.getRange(this));
         division.setText(SaveSharedPreference.getDivision(this));
 
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("Service status", "Running");
+                return true;
+            }
+        }
+        Log.i ("Service status", "Not running");
+        return false;
     }
 
     @Override

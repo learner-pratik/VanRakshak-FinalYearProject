@@ -47,7 +47,6 @@ public class ForestService extends Service {
     private NotificationChannel taskChannel, alertChannel, forestServiceChannel;
     private static final String TASK_CHANNEL_ID = "TASK", ALERT_CHANNEL_ID = "ALERT", SERVICE_CHANNEL_ID = "SERVICE";
     private static final int taskNotificationId = 1, alertNotificationId = 2;
-    private String token;
     private Task task;
     private Alert alert;
     private Context ctx = this;
@@ -107,7 +106,7 @@ public class ForestService extends Service {
 
                 @Override
                 public void onOpen() {
-                    connection.sendMessage(token);
+                    connection.sendMessage(SaveSharedPreference.getAuthToken(ctx));
                 }
 
                 @Override
@@ -188,6 +187,19 @@ public class ForestService extends Service {
     private void sendTaskNotification() {
 
         createTaskNotificationChannel();
+
+        task = new Task();
+        try {
+            task.setTaskID(responseObject.getString("id"));
+            task.setTaskType(responseObject.getString("task_type"));
+            task.setTaskName(responseObject.getString("task_name"));
+            task.setTaskDescription(responseObject.getString("description"));
+            task.setAssignedBy(responseObject.getString("assigning_officer"));
+            Date date = new SimpleDateFormat("yyyy-mm-dd").parse(responseObject.getString("deadline"));
+            task.setTaskDeadline(date);
+        } catch (JSONException | ParseException e) {
+            e.printStackTrace();
+        }
 
         Intent taskListIntent = new Intent(this, TaskListActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(

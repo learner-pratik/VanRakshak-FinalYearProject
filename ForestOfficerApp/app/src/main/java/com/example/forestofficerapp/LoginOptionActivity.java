@@ -17,9 +17,6 @@ public class LoginOptionActivity extends Activity {
     private final String LOG_TAG = this.getClass().getSimpleName();
     public static final String BASE_URL = "https://vanrakshak.herokuapp.com";
 
-    Intent forestServiceIntent;
-    private ForestService forestService;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,12 +24,6 @@ public class LoginOptionActivity extends Activity {
 
         Button registerButton = findViewById(R.id.registerButton);
         Button loginButton = findViewById(R.id.loginButton);
-
-        forestService = new ForestService();
-        forestServiceIntent = new Intent(this, forestService.getClass());
-        if (!isMyServiceRunning(forestServiceIntent.getClass())) {
-            startService(forestServiceIntent);
-        }
 
         String loginEmail = SaveSharedPreference.getEmail(this);
         String loginPassword = SaveSharedPreference.getPassword(this);
@@ -62,17 +53,5 @@ public class LoginOptionActivity extends Activity {
                 Toast.makeText(this, "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i ("Service status", "Running");
-                return true;
-            }
-        }
-        Log.i ("Service status", "Not running");
-        return false;
     }
 }
