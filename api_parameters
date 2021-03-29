@@ -154,3 +154,25 @@ response - {
 		
 	]
 } // response is json object with task key and jsonarray as value
+
+11. Animal response from GPS app
+url - "/animal_socket"
+request - {
+	"animal" : "<animal_name>",
+	"id" : "<animal_id>",
+	"latitude" : "<geo_latitude>",
+	"longitude" : "<geo_longitude>"
+}
+
+12. Animal response from server
+url - "/animal_socket"
+request - {
+	"animals" : [
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+			"latitude" : "<geo_latitude>",
+			"longitude" : "<geo_longitude>"	
+		}
+	]
+}
