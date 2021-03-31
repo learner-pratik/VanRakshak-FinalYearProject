@@ -14,21 +14,26 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppbar"
-            style="@style/Widget.Vanrakshak.Toolbar"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_menu_24px"
-            app:logo="@drawable/logo_removebg_preview"
-            app:title="@string/forest_app_bar_name"
-            app:menu="@menu/appbar_menu" />
-    </com.google.android.material.appbar.AppBarLayout>
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppbar"
+                style="@style/Widget.Vanrakshak.Toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@drawable/ic_menu_24px"
+                app:logo="@drawable/logo_removebg_preview"
+                app:title="@string/forest_app_bar_name"
+                app:menu="@menu/appbar_menu" />
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <com.mapbox.mapboxsdk.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 

@@ -20,24 +20,22 @@
         <activity android:name=".AnimalActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"/>
-        <service android:name=".LocationService"/>
-<!--        <service-->
-<!--            android:name=".LocationService"-->
-<!--            android:enabled="true">-->
-<!--        </service>-->
-<!--        <receiver-->
-<!--            android:name=".LocationReceiver"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="RestartService" />-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
+        <service
+            android:name=".LocationService"
+            android:enabled="true">
+        </service>
+        <receiver
+            android:name=".LocationReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="RestartService" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

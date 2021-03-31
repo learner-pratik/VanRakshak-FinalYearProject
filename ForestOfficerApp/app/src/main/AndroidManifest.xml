@@ -37,6 +37,7 @@
         <activity android:name=".AnimalListActivity"></activity>
         <activity android:name=".AlertListActivity"></activity>
         <activity android:name=".MapActivity"></activity>
+        <service android:name=".AnimalService"/>
         <service
             android:name=".ForestService"
             android:enabled="true">

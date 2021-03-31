@@ -15,11 +15,13 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
@@ -27,9 +29,25 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineCallback;
+import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
+import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.Style;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.crossbar.autobahn.websocket.WebSocketConnection;
 import io.crossbar.autobahn.websocket.WebSocketConnectionHandler;
@@ -42,32 +60,26 @@ public class LocationService extends Service {
     private static final String DEMO_URL = "ws://forestwebsocket.herokuapp.com/test";
     private static final String SOCKET_URL = "ws://vanrakshak.herokuapp.com/animal_socket";
     private final String LOG_TAG = this.getClass().getSimpleName();
-    private NotificationManager serviceNotificationManager;
-    private NotificationChannel locationServiceChannel;
-    private static final String SERVICE_CHANNEL_ID = "SERVICE";
-    private static FusedLocationProviderClient fusedLocationClient;
-    private static LocationRequest locationRequest;
-    private static LocationCallback locationCallback;
+    private NotificationManager serviceNotificationManager, locationNotificationManager;
+    private NotificationChannel locationServiceChannel, locationChannel;
+    private static final String SERVICE_CHANNEL_ID = "SERVICE", LOCATION_CHANNEL_ID="LOCATION";
     private Context ctx = this;
+
+    // Variables needed to add the location engine
+    private LocationEngine locationEngine;
+    private long DEFAULT_INTERVAL_IN_MILLISECONDS = 10000L;
+    private long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
+    // Variables needed to listen to location updates
+    private ServiceLocationCallback callback = new ServiceLocationCallback(this);
 
     @Override
     public void onCreate() {
         super.onCreate();
-//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//        createLocationRequest();
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
-//            startMyOwnForeground();
-//        else
-//            startForeground(1, new Notification());
-    }
 
-    private void createLocationRequest() {
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        float f = (float) 0.01;
-        locationRequest.setSmallestDisplacement(f);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
+            startMyOwnForeground();
+        else
+            startForeground(1, new Notification());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -100,36 +112,8 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-
         connectWebSocket();
-//        locationCallback = new LocationCallback() {
-//            @Override
-//            public void onLocationResult(@NonNull LocationResult locationResult) {
-//                super.onLocationResult(locationResult);
-//                if (locationResult == null) {
-//                    return;
-//                }
-//                for (Location location : locationResult.getLocations()) {
-//                    String latitude = String.valueOf(location.getLatitude());
-//                    String longitude = String.valueOf(location.getLongitude());
-//                    connection.sendMessage("location : "+latitude+" "+longitude);
-//                }
-//            }
-//
-//            @Override
-//            public void onLocationAvailability(@NonNull LocationAvailability locationAvailability) {
-//                super.onLocationAvailability(locationAvailability);
-//            }
-//        };
-//        startLocationUpdates();
         return START_STICKY;
-    }
-
-    @SuppressLint("MissingPermission")
-    private void startLocationUpdates() {
-        fusedLocationClient.requestLocationUpdates(locationRequest,
-                locationCallback,
-                Looper.getMainLooper());
     }
 
     private void connectWebSocket() {
@@ -140,30 +124,11 @@ public class LocationService extends Service {
                 @Override
                 public void onConnect(ConnectionResponse response) {
                     Log.d(LOG_TAG, "Connected to server");
+                    initLocationEngine();
                 }
 
                 @Override
                 public void onOpen() {
-                    JSONObject jsonObject = new JSONObject();
-                    String latitude, longitude;
-                    if (MainActivity.currentLocation==null) {
-                        latitude = "19.725894548";
-                        longitude = "72.321456237";
-                    } else {
-                        latitude = String.valueOf(MainActivity.currentLocation.getLatitude());
-                        longitude = String.valueOf(MainActivity.currentLocation.getLongitude());
-                    }
-                    Log.d(LOG_TAG, latitude);
-                    Log.d(LOG_TAG, longitude);
-                    try {
-                        jsonObject.put("animal", SaveSharedPreferences.getAnimal(ctx).toLowerCase());
-                        jsonObject.put("id", "id-1");
-                        jsonObject.put("latitude", latitude);
-                        jsonObject.put("longitude", longitude);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    connection.sendMessage(jsonObject.toString());
                 }
 
                 @Override
@@ -181,12 +146,120 @@ public class LocationService extends Service {
         }
     }
 
+    private void sendNotification(String payload) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, LOCATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_baseline_my_location_24)
+                .setContentTitle("Location")
+                .setContentText(payload);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(1, builder.build());
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Location Channel";
+            String description = "Channel for getting location updates";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+
+            locationChannel = new NotificationChannel(LOCATION_CHANNEL_ID, name, importance);
+            locationChannel.setDescription(description);
+
+            locationNotificationManager = getSystemService(NotificationManager.class);
+            locationNotificationManager.createNotificationChannel(locationChannel);
+        }
+    }
+
+    /**
+     * Set up the LocationEngine and the parameters for querying the device's location
+     */
+    @SuppressLint("MissingPermission")
+    private void initLocationEngine() {
+        System.out.println("location method called");
+        locationEngine = LocationEngineProvider.getBestLocationEngine(this);
+
+        LocationEngineRequest request = new LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
+                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build();
+
+        locationEngine.requestLocationUpdates(request, callback, getMainLooper());
+        locationEngine.getLastLocation(callback);
+    }
+
+    @SuppressLint("MissingPermission")
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        Intent broadcastIntent = new Intent();
-//        broadcastIntent.setAction("RestartService");
-//        broadcastIntent.setClass(this, LocationReceiver.class);
-//        this.sendBroadcast(broadcastIntent);
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("RestartService");
+        broadcastIntent.setClass(this, LocationReceiver.class);
+        this.sendBroadcast(broadcastIntent);
     }
+
+    private static class ServiceLocationCallback
+            implements LocationEngineCallback<LocationEngineResult> {
+
+        private final WeakReference<LocationService> activityWeakReference;
+
+        ServiceLocationCallback(LocationService service) {
+            this.activityWeakReference = new WeakReference<>(service);
+        }
+
+        /**
+         * The LocationEngineCallback interface's method which fires when the device's location has changed.
+         *
+         * @param result the LocationEngineResult object which has the last known location within it.
+         */
+        @SuppressLint("StringFormatInvalid")
+        @Override
+        public void onSuccess(LocationEngineResult result) {
+            LocationService service = activityWeakReference.get();
+
+            if (service != null) {
+                Location location = result.getLastLocation();
+
+                if (location == null) {
+                    return;
+                }
+
+                String myLatitude = String.valueOf(location.getLongitude());
+                String myLongitude = String.valueOf(location.getLongitude());
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("animal", "tiger");
+                    jsonObject.put("id", "id_2");
+                    jsonObject.put("latitude", myLatitude);
+                    jsonObject.put("longitude", myLongitude);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                service.connection.sendMessage(jsonObject.toString());
+                service.createNotificationChannel();
+                service.sendNotification(myLatitude+" "+myLongitude);
+
+                Log.d("ADebugTag", "Value: " + (result.getLastLocation().getLatitude()));
+
+                // Create a Toast which displays the new location's coordinates
+                Toast.makeText(service, String.format(service.getString(R.string.new_location),
+                        result.getLastLocation().getLatitude(), result.getLastLocation().getLongitude()),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        /**
+         * The LocationEngineCallback interface's method which fires when the device's location can not be captured
+         *
+         * @param exception the exception message
+         */
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+            Log.d("LocationChangeActivity", exception.getLocalizedMessage());
+            LocationService service = activityWeakReference.get();
+            if (service != null) {
+                Toast.makeText(service, exception.getLocalizedMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 }

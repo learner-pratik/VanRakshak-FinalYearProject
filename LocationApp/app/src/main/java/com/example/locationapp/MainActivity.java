@@ -30,19 +30,16 @@ import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.mapbox.android.core.permissions.PermissionsListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements PermissionsListener {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
-    private static final int REQUEST_CHECK_SETTINGS = 2;
-    private static final int PERMISSIONS_REQUEST = 1;
-    private static final String PERMISSION_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    public static FusedLocationProviderClient fusedLocationClient;
-    public static Location currentLocation;
-    public static LocationRequest locationRequest;
-    private static Task<LocationSettingsResponse> result;
-    private static Double latitude, longitude;
-    Intent locationServiceIntent;
+    public static PermissionsManager permissionsManager;
+    private Intent locationServiceIntent;
     private LocationService locationService;
 
     @Override
@@ -50,20 +47,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (hasPermission()) {
-            getCurrentLocation();
+        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+            locationService = new LocationService();
+            locationServiceIntent = new Intent(this, locationService.getClass());
+            if (!isMyServiceRunning(locationServiceIntent.getClass())) {
+                startService(locationServiceIntent);
+            }
         } else {
-            requestPermission();
+            permissionsManager = new PermissionsManager(this);
+            permissionsManager.requestLocationPermissions(this);
         }
-
-        createLocationRequest();
-        checkResult();
-
-        locationService = new LocationService();
-        locationServiceIntent = new Intent(this, locationService.getClass());
-        startService(locationServiceIntent);
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -78,134 +71,32 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private void checkResult() {
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
-
-        result = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build());
-
-        result.addOnCompleteListener(task -> {
-            try {
-                LocationSettingsResponse response = task.getResult(ApiException.class);
-                LocationSettingsStates states = response.getLocationSettingsStates();
-                // All location settings are satisfied. The client can initialize location
-                // requests here.
-            } catch (ApiException exception) {
-                switch (exception.getStatusCode()) {
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied. But could be fixed by showing the
-                        // user a dialog.
-                        try {
-                            // Cast to a resolvable exception.
-                            ResolvableApiException resolvable = (ResolvableApiException) exception;
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            resolvable.startResolutionForResult(
-                                    MainActivity.this,
-                                    REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        } catch (ClassCastException e) {
-                            // Ignore, should be an impossible error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way to fix the
-                        // settings so we won't show the dialog.
-                        break;
-                }
-            }
-        });
-    }
-
-    private void createLocationRequest() {
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        float f = (float) 0.01;
-        locationRequest.setSmallestDisplacement(f);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        // All required changes were successfully made
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        // The user was asked to change settings, but chose not to
-                        break;
-                    default:
-                        break;
-                }
-                break;
-        }
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(this, R.string.user_location_permission_explanation, Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onRequestPermissionsResult(
-            final int requestCode, final String[] permissions, final int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSIONS_REQUEST) {
-            if (allPermissionsGranted(grantResults)) {
-                getCurrentLocation();
-            } else {
-                requestPermission();
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            locationService = new LocationService();
+            locationServiceIntent = new Intent(this, locationService.getClass());
+            if (!isMyServiceRunning(locationServiceIntent.getClass())) {
+                startService(locationServiceIntent);
             }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private void getCurrentLocation() {
-        fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-            currentLocation = location;
-            if (location != null) {
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
-                Log.d(LOG_TAG, String.valueOf(latitude));
-                Log.d(LOG_TAG, String.valueOf(longitude));
-            }
-        });
-    }
-
-    private boolean hasPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return checkSelfPermission(PERMISSION_LOCATION) == PackageManager.PERMISSION_GRANTED;
         } else {
-            return true;
+            Toast.makeText(this, R.string.user_location_permission_not_granted, Toast.LENGTH_LONG).show();
+            finish();
         }
-    }
-
-    private void requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (shouldShowRequestPermissionRationale(PERMISSION_LOCATION)) {
-                Toast.makeText(
-                        this,
-                        "Location permission is required for this demo",
-                        Toast.LENGTH_LONG)
-                        .show();
-            }
-            requestPermissions(new String[] {PERMISSION_LOCATION}, PERMISSIONS_REQUEST);
-        }
-    }
-
-    private static boolean allPermissionsGranted(final int[] grantResults) {
-        for (int result : grantResults) {
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(this, locationService.getClass()));
     }
 }

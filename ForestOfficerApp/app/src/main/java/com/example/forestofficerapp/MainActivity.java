@@ -45,10 +45,14 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -59,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle drawerToggle;
     private TextView name, email, designation, beat, range, division, headerOfficerName, headerOfficerDesignation;
     public static final String logoutURL = "/logout/";
+    public static final String animalListURL = "/animal_api/";
+    public static Map<String, List<String>> map = new HashMap<>();
 
     Intent forestServiceIntent;
     private ForestService forestService;
@@ -73,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (!isMyServiceRunning(forestServiceIntent.getClass())) {
             startService(forestServiceIntent);
         }
+        startService(new Intent(this, AnimalService.class));
 
         topAppBar = findViewById(R.id.topAppbar);
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -98,6 +105,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         range.setText(SaveSharedPreference.getRange(this));
         division.setText(SaveSharedPreference.getDivision(this));
 
+        if (map.isEmpty()) getAnimalList();
+    }
+
+    private void getAnimalList() {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("empid", SaveSharedPreference.getEmployeeID(this));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                animalListURL, jsonObject, response -> {
+
+            try {
+                JSONArray jsonArray = response.getJSONArray("animals");
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Iterator<String> animals = response.keys();
+            while(animals.hasNext()) {
+                String animal_name = animals.next();
+                List<String> animal_id = new ArrayList<>();
+                try {
+                    JSONArray object = response.getJSONArray(animal_name);
+                    for (int i = 0; i < object.length(); i++) {
+                        animal_id.add(object.getString(i));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                map.put(animal_name, animal_id);
+            }
+
+        }, error -> {
+            Log.d(LOG_TAG, "post request failed");
+            error.printStackTrace();
+        }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {

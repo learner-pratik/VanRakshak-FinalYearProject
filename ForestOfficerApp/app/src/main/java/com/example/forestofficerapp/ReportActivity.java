@@ -370,6 +370,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
             imageView.setImageBitmap(photo);
             reportName.getEditText().setText(SaveSharedPreference.getReportName(this));
             reportDescription.getEditText().setText(SaveSharedPreference.getReportDescription(this));
+
         }
     }
 }

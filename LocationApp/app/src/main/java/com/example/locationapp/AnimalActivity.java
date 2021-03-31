@@ -20,10 +20,10 @@ public class AnimalActivity extends AppCompatActivity implements AdapterView.OnI
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (!SaveSharedPreferences.getAnimal(this).isEmpty()) startMainActivity();
-
         setContentView(R.layout.activity_animal);
+
+        System.out.println(SaveSharedPreferences.getAnimal(this));
+        if (!SaveSharedPreferences.getAnimal(this).isEmpty()) startMainActivity();
 
         final Spinner spinner = findViewById(R.id.spinner);
         MaterialButton button= findViewById(R.id.reportListNextButton);

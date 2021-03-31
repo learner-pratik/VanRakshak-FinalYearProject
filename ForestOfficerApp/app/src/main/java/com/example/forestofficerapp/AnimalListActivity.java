@@ -7,6 +7,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,17 +26,23 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class AnimalListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class AnimalListActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemSelectedListener {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
     private MaterialToolbar topAppBar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
+    private Spinner animalSpinner, animalIdSpinner;
+    private MaterialButton submitButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,12 +51,66 @@ public class AnimalListActivity extends AppCompatActivity implements NavigationV
 
         topAppBar = findViewById(R.id.topAppbar);
         drawerLayout = findViewById(R.id.drawerLayout);
+        animalSpinner = findViewById(R.id.animalSpinner);
+        animalIdSpinner = findViewById(R.id.animalIdSpinner);
+        submitButton = findViewById(R.id.animalListNextButton);
 
         setSupportActionBar(topAppBar);
         setNavigationViewListener();
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+
+        // Spinner Drop down elements
+        List<String> animalTypes = new ArrayList<String>();
+        animalTypes.add("All");
+        for (Map.Entry<String, List<String>> entry : MainActivity.map.entrySet()) {
+            String animal = entry.getKey();
+            animal = animal.substring(0, 1).toUpperCase()+animal.substring(1, animal.length());
+            animalTypes.add(animal);
+        }
+
+        ArrayAdapter<String> animalAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, animalTypes);
+        animalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        animalSpinner.setAdapter(animalAdapter);
+        animalSpinner.setSelection(0);
+        animalSpinner.setOnItemSelectedListener(this);
+
+        //spinner 2
+        String[] vi = {"All"};
+        ArrayAdapter<String> tempAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, vi);
+        tempAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        animalIdSpinner.setAdapter(tempAdapter);
+        animalIdSpinner.setSelection(0);
+        animalIdSpinner.setOnItemSelectedListener(this);
+        animalIdSpinner.setEnabled(false);
+        animalIdSpinner.setClickable(false);
+
+        submitButton.setOnClickListener(v -> {
+            Intent mapIntent = new Intent(this, MapActivity.class);
+            HashMap<String, List<String>> copy;
+
+            if(animalSpinner.getSelectedItemPosition()==0){
+                copy = new HashMap<>(MainActivity.map);
+                mapIntent.putExtra("map", copy);
+            }
+            else{
+                String animal = animalSpinner.getSelectedItem().toString().toLowerCase();
+                if(animalIdSpinner.getSelectedItemPosition()==0){
+                    copy = new HashMap<>();
+                    copy.put(animal, MainActivity.map.get(animal));
+                }
+                else{
+                    copy = new HashMap<>();
+                    List<String> list = new ArrayList<>();
+                    list.add(animalIdSpinner.getSelectedItem().toString());
+                    copy.put(animal, list);
+                }
+            }
+
+            mapIntent.putExtra("map",copy);
+            startActivity(mapIntent);
+        });
     }
 
     @Override
@@ -132,5 +196,41 @@ public class AnimalListActivity extends AppCompatActivity implements NavigationV
         name.setText(SaveSharedPreference.getName(this));
         designation.setText(SaveSharedPreference.getDesignation(this));
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        switch (parent.getId()) {
+
+            case R.id.animalSpinner : {
+                if (parent.getSelectedItemPosition()!=0) {
+                    String animalName = parent.getSelectedItem().toString().toLowerCase();
+                    List<String> animalId = MainActivity.map.get(animalName);
+                    animalId.add(0, "All");
+
+                    ArrayAdapter<String> animalIDAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, animalId);
+                    animalIDAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    animalIdSpinner.setAdapter(animalIDAdapter);
+                    animalIdSpinner.setSelection(0);
+                    animalIdSpinner.setClickable(true);
+                    animalIdSpinner.setEnabled(true);
+                    animalIdSpinner.setOnItemSelectedListener(this);
+                } else {
+                    animalIdSpinner.setSelection(0);
+                    animalIdSpinner.setClickable(false);
+                    animalIdSpinner.setEnabled(false);
+                }
+                break;
+            }
+            case R.id.animalIdSpinner : {
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

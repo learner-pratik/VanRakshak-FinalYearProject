@@ -176,3 +176,54 @@ request - {
 		}
 	]
 }
+
+13. Animal list for dropdown
+url - "/animal_api"
+request - {
+	"empid" : "<employee_id>"
+}
+response - {
+	"animals" : [
+		{
+			"animal" : "<animal_name>",
+			"id" : ["id_1", "id_2"],
+		},
+		{
+			"animal" : "<animal_name>",
+			"id" : ["id_1", "id_2"],
+		},
+	]
+}
+
+14. Animal location request 
+url - "/animal_list"
+request - {
+	"animals" : [
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+		},
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+			"latitue" : "<geo_latitude>",
+			"longitude" : "<geo_longitude>",
+		},
+	]
+}
+response - {
+	"animals" : [
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+			"latitue" : "<geo_latitude>",
+			"longitude" : "<geo_longitude>",
+		},
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+			"latitue" : "<geo_latitude>",
+			"longitude" : "<geo_longitude>",
+		},
+	]
+}
