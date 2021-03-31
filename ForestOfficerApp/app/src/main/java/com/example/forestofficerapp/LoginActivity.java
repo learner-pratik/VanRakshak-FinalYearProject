@@ -158,7 +158,7 @@ public class LoginActivity extends Activity {
 
                     try {
                         profileName = userProfile.getString("name");
-                        profileDesignation = userProfile.getString("designation");
+                        profileDesignation = "Forest Employee";
                         profileBeat = userProfile.getString("beat");
                         profileRange = userProfile.getString("range");
                         profileDivision = userProfile.getString("division");

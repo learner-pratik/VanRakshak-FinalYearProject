@@ -91,6 +91,8 @@ public class AlertListActivity extends AppCompatActivity implements NavigationVi
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub

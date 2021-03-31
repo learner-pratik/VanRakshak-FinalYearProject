@@ -170,6 +170,8 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub

@@ -61,7 +61,7 @@
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TASK TYPE"/>
+                        android:text="TASK TYPE -"/>
 
                     <TextView
                         android:id="@+id/taskPageTypeName"
@@ -80,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
                     android:layout_marginBottom="10dp"
-                    android:text="DESCRIPTION"/>
+                    android:text="DESCRIPTION - "/>
 
                 <TextView
                     android:id="@+id/taskPageTaskDescription"
@@ -104,7 +104,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:text="ASSIGNED BY"/>
+                        android:text="ASSIGNED BY -"/>
 
                     <TextView
                         android:id="@+id/taskPageTaskAssigner"
@@ -130,7 +130,7 @@
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="DEADLINE"/>
+                        android:text="DEADLINE -"/>
 
                     <TextView
                         android:id="@+id/taskPageDeadlineDate"

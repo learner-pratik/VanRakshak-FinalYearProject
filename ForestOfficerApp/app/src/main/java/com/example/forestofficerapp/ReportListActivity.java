@@ -122,6 +122,8 @@ public class ReportListActivity extends AppCompatActivity implements AdapterView
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub

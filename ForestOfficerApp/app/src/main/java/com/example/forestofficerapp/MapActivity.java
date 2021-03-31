@@ -232,6 +232,8 @@ public class MapActivity extends AppCompatActivity
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub
@@ -426,6 +428,7 @@ public class MapActivity extends AppCompatActivity
         // When the user returns to the activity we want to resume the API calling.
         if (handler != null && runnable != null) {
             handler.post(runnable);
+            webSocketConnection.reconnect();
         }
     }
 
@@ -439,6 +442,7 @@ public class MapActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         mapView.onStop();
+        webSocketConnection.sendClose();
     }
 
     @Override

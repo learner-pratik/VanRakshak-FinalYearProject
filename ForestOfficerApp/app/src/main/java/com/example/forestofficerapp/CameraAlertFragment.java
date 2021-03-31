@@ -44,7 +44,9 @@ public class CameraAlertFragment extends Fragment {
         adapter = new AlertCardRecyclerViewAdapter(cameraAlertList, new ClickListener() {
             @Override
             public void onPositionClicked(int position) {
-                Intent mapActivityIntent = new Intent(view.getContext(), MapActivity.class);
+                Intent mapActivityIntent = new Intent(view.getContext(), AlertMapActivity.class);
+                mapActivityIntent.putExtra("type", "camera");
+                mapActivityIntent.putExtra("alertIndex", position);
                 startActivity(mapActivityIntent);
             }
 

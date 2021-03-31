@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -46,10 +47,11 @@ public class ForestService extends Service {
     private NotificationManager taskNotificationManager, alertNotificationManager, serviceNotificationManager;
     private NotificationChannel taskChannel, alertChannel, forestServiceChannel;
     private static final String TASK_CHANNEL_ID = "TASK", ALERT_CHANNEL_ID = "ALERT", SERVICE_CHANNEL_ID = "SERVICE";
-    private static final int taskNotificationId = 1, alertNotificationId = 2;
+    private static final int taskNotificationId = 3, alertNotificationId = 4;
     private Task task;
     private Alert alert;
     private Context ctx = this;
+    public static boolean logoutOption = false;
 
     @Override
     public void onCreate() {
@@ -75,7 +77,7 @@ public class ForestService extends Service {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, SERVICE_CHANNEL_ID);
         Notification notification = notificationBuilder.setOngoing(true)
                 .setContentTitle("ForestOfficerApp is running in background")
-                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
         startForeground(2, notification);
@@ -155,7 +157,27 @@ public class ForestService extends Service {
         }
 
         if (type.equals("hunter")) name = "Hunter Spotting";
-        else if (type.equals("sos")) name = "Settlement Emergency";
+        else if (type.equals("sos")) {
+            String sosType = "";
+            try {
+                sosType = responseObject.getString("sos_type");
+                char[] charArray = sosType.toCharArray();
+                boolean foundSpace = true;
+                for(int i = 0; i < charArray.length; i++) {
+                    if(Character.isLetter(charArray[i])) {
+                        if(foundSpace) {
+                            charArray[i] = Character.toUpperCase(charArray[i]);
+                            foundSpace = false;
+                        }
+                    }
+                    else foundSpace = true;
+                }
+                sosType = String.valueOf(charArray);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            name = sosType;
+        }
         else name = "Camera Broken";
 
         try {
@@ -202,16 +224,19 @@ public class ForestService extends Service {
         }
 
         Intent taskListIntent = new Intent(this, TaskListActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                this, (int) System.currentTimeMillis(), taskListIntent, 0
-        );
+        // Create the TaskStackBuilder and add the intent, which inflates the back stack
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntentWithParentStack(taskListIntent);
+        // Get the PendingIntent containing the entire back stack
+        PendingIntent taskPendingIntent =
+                stackBuilder.getPendingIntent(1, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, TASK_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_content_task_24px)
                 .setContentTitle(task.getTaskType())
                 .setContentInfo(task.getTaskName())
                 .setContentText("Assigned By - "+task.getAssignedBy())
-                .setContentIntent(pendingIntent)
+                .setContentIntent(taskPendingIntent)
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
@@ -237,15 +262,18 @@ public class ForestService extends Service {
         createAlertNotificationChannel();
 
         Intent alertListIntent = new Intent(this, AlertListActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                this, (int) System.currentTimeMillis(), alertListIntent, 0
-        );
+        // Create the TaskStackBuilder and add the intent, which inflates the back stack
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntentWithParentStack(alertListIntent);
+        // Get the PendingIntent containing the entire back stack
+        PendingIntent alertPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, ALERT_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_add_alert_24px)
                 .setContentTitle(alert.getAlertType())
                 .setContentText(alert.getAlertName())
-                .setContentIntent(pendingIntent)
+                .setContentIntent(alertPendingIntent)
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
@@ -270,10 +298,12 @@ public class ForestService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("RestartService");
-        broadcastIntent.setClass(this, ForestReceiver.class);
-        this.sendBroadcast(broadcastIntent);
+        if (!logoutOption) {
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction("RestartService");
+            broadcastIntent.setClass(this, ForestReceiver.class);
+            this.sendBroadcast(broadcastIntent);
+        }
     }
 
 }

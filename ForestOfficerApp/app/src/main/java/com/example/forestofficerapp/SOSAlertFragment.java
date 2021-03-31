@@ -44,7 +44,9 @@ public class SOSAlertFragment extends Fragment {
         adapter = new SosCardRecyclerViewAdapter(sosAlertList, new ClickListener() {
             @Override
             public void onPositionClicked(int position) {
-                Intent mapActivityIntent = new Intent(view.getContext(), MapActivity.class);
+                Intent mapActivityIntent = new Intent(view.getContext(), AlertMapActivity.class);
+                mapActivityIntent.putExtra("type", "sos");
+                mapActivityIntent.putExtra("alertIndex", position);
                 startActivity(mapActivityIntent);
             }
 

@@ -218,6 +218,9 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
             photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
             taskReport.getEditText().setText(SaveSharedPreference.getTaskReport(this));
+            Intent taskIntent = new Intent(this, TaskActivity.class);
+            startActivity(taskIntent);
+            finish();
         }
     }
 
@@ -299,6 +302,8 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub

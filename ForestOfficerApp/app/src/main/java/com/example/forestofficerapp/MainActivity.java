@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (!isMyServiceRunning(forestServiceIntent.getClass())) {
             startService(forestServiceIntent);
         }
-        startService(new Intent(this, AnimalService.class));
 
         topAppBar = findViewById(R.id.topAppbar);
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -118,32 +117,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        String url = LoginOptionActivity.BASE_URL+animalListURL;
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                animalListURL, jsonObject, response -> {
+                url, jsonObject, response -> {
+            Log.d(LOG_TAG, response.toString());
 
             try {
                 JSONArray jsonArray = response.getJSONArray("animals");
 
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject object = jsonArray.getJSONObject(i);
 
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    String animalName = object.getString("animal");
+                    JSONArray array = object.getJSONArray("id");
+                    List<String> list = new ArrayList<>();
+
+                    for (int j = 0; j < array.length(); j++) {
+                        list.add(array.getString(j));
+                    }
+
+                    map.put(animalName, list);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
-            Iterator<String> animals = response.keys();
-            while(animals.hasNext()) {
-                String animal_name = animals.next();
-                List<String> animal_id = new ArrayList<>();
-                try {
-                    JSONArray object = response.getJSONArray(animal_name);
-                    for (int i = 0; i < object.length(); i++) {
-                        animal_id.add(object.getString(i));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                map.put(animal_name, animal_id);
             }
 
         }, error -> {
@@ -195,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 response -> {
                     // response
                     Log.d(LOG_TAG,"Logout-response : " + response);
+                    ForestService.logoutOption = true;
                     Intent serviceIntent = new Intent(this, ForestService.class);
                     stopService(serviceIntent);
                 },
