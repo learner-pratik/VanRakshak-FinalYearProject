@@ -178,6 +178,8 @@ public class LoginActivity extends Activity {
                     SaveSharedPreference.setDivision(this, profileDivision);
                     SaveSharedPreference.setEmployeeID(this, profileEmployeeID);
                     SaveSharedPreference.setAuthToken(this, authToken);
+                    SaveSharedPreference.setSubmittedReports(this, 0);
+                    SaveSharedPreference.setSubmittedReports(this, 0);
                     break;
                 }
                 default:

@@ -52,6 +52,7 @@ public class ForestService extends Service {
     private Alert alert;
     private Context ctx = this;
     public static boolean logoutOption = false;
+    private WebSocketConnection webSocketConnection;
 
     @Override
     public void onCreate() {
@@ -98,9 +99,9 @@ public class ForestService extends Service {
 
     private void connectWebSocket() {
 
-        WebSocketConnection connection = new WebSocketConnection();
+        webSocketConnection = new WebSocketConnection();
         try {
-            connection.connect(SOCKET_URL, new WebSocketConnectionHandler() {
+            webSocketConnection.connect(SOCKET_URL, new WebSocketConnectionHandler() {
                 @Override
                 public void onConnect(ConnectionResponse response) {
                     Log.d(LOG_TAG, "Connected to server");
@@ -108,7 +109,7 @@ public class ForestService extends Service {
 
                 @Override
                 public void onOpen() {
-                    connection.sendMessage(SaveSharedPreference.getAuthToken(ctx));
+                    webSocketConnection.sendMessage(SaveSharedPreference.getAuthToken(ctx));
                 }
 
                 @Override
@@ -303,6 +304,9 @@ public class ForestService extends Service {
             broadcastIntent.setAction("RestartService");
             broadcastIntent.setClass(this, ForestReceiver.class);
             this.sendBroadcast(broadcastIntent);
+        } else {
+            webSocketConnection.sendClose();
+            System.out.println(webSocketConnection.isConnected());
         }
     }
 

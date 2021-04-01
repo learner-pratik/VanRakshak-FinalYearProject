@@ -204,8 +204,8 @@ import javax.mail.internet.MimeMessage;
 
     private static class OtpAsyncTask extends AsyncTask<String, Void, Boolean> {
 
-        private static final String username = "pratiknaik4799@gmail.com";
-        private static final String password = "uzumakinaruto@4799";
+        private static final String username = "vanrakshakheroku@gmail.com";
+        private static final String password = "uzumakiNaruto@9974";
         private String registeredEmail, generatedOtp;
 
         private WeakReference<RegisterEmailActivity> activityWeakReference;

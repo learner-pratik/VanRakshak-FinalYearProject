@@ -158,7 +158,6 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
             geoLatitude = Double.toString(latitude);
             geoLongitude = Double.toString(longitude);
         }
-        String name = reportName.getEditText().getText().toString();
         String description = reportDescription.getEditText().getText().toString();
         String url = LoginOptionActivity.BASE_URL+reportURL;
         String clickedPicture = BitMapToString(photo);
@@ -171,7 +170,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         JSONObject postData = new JSONObject();
         try {
             postData.put("empid", SaveSharedPreference.getEmployeeID(this));
-            postData.put("name", name);
+            postData.put("name", SaveSharedPreference.getName(this));
             postData.put("type", reportType);
             postData.put("description", description);
             postData.put("latitude", geoLatitude);
@@ -194,6 +193,8 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
             progressBar.setVisibility(View.INVISIBLE);
             if (status) {
                 progressMessage.setText("REPORT SENT");
+                int r = SaveSharedPreference.getSubmittedReports(this);
+                SaveSharedPreference.setSubmittedReports(this, r+1);
             } else {
                 progressMessage.setText("UNABLE TO SEND REPORT");
             }
@@ -372,7 +373,6 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
             imageView.setImageBitmap(photo);
             reportName.getEditText().setText(SaveSharedPreference.getReportName(this));
             reportDescription.getEditText().setText(SaveSharedPreference.getReportDescription(this));
-
         }
     }
 }

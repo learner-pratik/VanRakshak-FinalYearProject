@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MaterialToolbar topAppBar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private TextView name, email, designation, beat, range, division, headerOfficerName, headerOfficerDesignation;
+    private TextView name, email, designation, beat, range, division, reportsSent, taskCompleted;
     public static final String logoutURL = "/logout/";
     public static final String animalListURL = "/animal_api/";
     public static Map<String, List<String>> map = new HashMap<>();
@@ -88,8 +88,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         beat = findViewById(R.id.profileBeatName);
         range = findViewById(R.id.profileRangeName);
         division = findViewById(R.id.profileDivisionName);
-        headerOfficerName = findViewById(R.id.personName);
-        headerOfficerDesignation = findViewById(R.id.personDesignation);
+        reportsSent = findViewById(R.id.profileReportsSubmitted);
+        taskCompleted = findViewById(R.id.profileTasksCompleted);
 
         setSupportActionBar(topAppBar);
         setNavigationViewListener();
@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         beat.setText(SaveSharedPreference.getBeat(this));
         range.setText(SaveSharedPreference.getRange(this));
         division.setText(SaveSharedPreference.getDivision(this));
+        reportsSent.setText(String.valueOf(SaveSharedPreference.getSubmittedReports(this)));
+        taskCompleted.setText(String.valueOf(SaveSharedPreference.getSubmittedTasks(this)));
 
         if (map.isEmpty()) getAnimalList();
     }

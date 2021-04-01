@@ -152,6 +152,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         String taskID = task.getTaskID();
         try {
             jsonObject.put("empid", SaveSharedPreference.getEmployeeID(this));
+            jsonObject.put("name", SaveSharedPreference.getName(this));
             jsonObject.put("taskID", taskID);
             jsonObject.put("report", reportData);
             jsonObject.put("latitude", geoLatitude);
@@ -173,6 +174,8 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
             progressBar.setVisibility(View.INVISIBLE);
             if (status) {
                 refreshTaskPage();
+                int t = SaveSharedPreference.getSubmittedTasks(this);
+                SaveSharedPreference.setSubmittedTasks(this, t+1);
             } else {
                 progressMessage.setText("FAILED TO SEND REPORT");
                 Handler handler = new Handler();
@@ -218,9 +221,6 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
             photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
             taskReport.getEditText().setText(SaveSharedPreference.getTaskReport(this));
-            Intent taskIntent = new Intent(this, TaskActivity.class);
-            startActivity(taskIntent);
-            finish();
         }
     }
 

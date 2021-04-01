@@ -167,7 +167,7 @@ public class MapActivity extends AppCompatActivity
 
                         map = mapboxMap;
 
-                        mapboxMap.setStyle(Style.SATELLITE_STREETS, style -> {
+                        mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
                             enableLocationComponent(style);
                             initSpaceStationSymbolLayer(style);
                             callApi();

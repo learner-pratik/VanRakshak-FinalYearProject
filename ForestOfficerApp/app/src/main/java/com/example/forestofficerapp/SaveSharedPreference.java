@@ -22,6 +22,8 @@ public class SaveSharedPreference {
     static final String reportNameKey = "REPORT-NAME";
     static final String reportDescriptionKey = "REPORT-DESCRIPTION";
     static final String taskReportKey = "TASK-REPORT";
+    static final String reportsSubmittedKey = "REPORT-SUBMITTED";
+    static final String tasksSubmittedKey = "TASK-SUBMITTED";
 
     static SharedPreferences getSharedPreferences(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -81,12 +83,6 @@ public class SaveSharedPreference {
         editor.commit();
     }
 
-    public static void setServiceFlag(Context ctx, Boolean flag) {
-        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
-        editor.putBoolean(forestServiceKey, flag);
-        editor.commit();
-    }
-
     public static void setReportName(Context ctx, String name) {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.putString(reportNameKey, name);
@@ -102,6 +98,18 @@ public class SaveSharedPreference {
     public static void setTaskReport(Context ctx, String report) {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.putString(taskReportKey, report);
+        editor.commit();
+    }
+
+    public static void setSubmittedReports(Context ctx, int num) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putInt(reportsSubmittedKey, num);
+        editor.commit();
+    }
+
+    public static void setSubmittedTasks(Context ctx, int num) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putInt(tasksSubmittedKey, num);
         editor.commit();
     }
 
@@ -141,14 +149,6 @@ public class SaveSharedPreference {
         return getSharedPreferences(ctx).getString(authTokenKey, "");
     }
 
-    public static Boolean getServiceFlag(Context ctx) {
-        return getSharedPreferences(ctx).getBoolean(forestServiceKey, false);
-    }
-
-    public static String getMessageList(Context ctx) {
-        return getSharedPreferences(ctx).getString(messageKey, "");
-    }
-
     public static String getReportName(Context ctx) {
         return getSharedPreferences(ctx).getString(reportNameKey, "");
     }
@@ -159,6 +159,14 @@ public class SaveSharedPreference {
 
     public static String getTaskReport(Context ctx) {
         return getSharedPreferences(ctx).getString(taskReportKey, "");
+    }
+
+    public static int getSubmittedReports(Context ctx) {
+        return getSharedPreferences(ctx).getInt(reportsSubmittedKey, 0);
+    }
+
+    public static int getSubmittedTasks(Context ctx) {
+        return getSharedPreferences(ctx).getInt(tasksSubmittedKey, 0);
     }
 
     public static void clearPreferences(Context ctx) {
