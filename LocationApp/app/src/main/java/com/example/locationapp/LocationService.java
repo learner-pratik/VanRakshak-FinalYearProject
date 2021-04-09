@@ -222,12 +222,12 @@ public class LocationService extends Service {
                     return;
                 }
 
-                String myLatitude = String.valueOf(location.getLongitude());
+                String myLatitude = String.valueOf(location.getLatitude());
                 String myLongitude = String.valueOf(location.getLongitude());
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("animal", "tiger");
-                    jsonObject.put("id", "id_2");
+                    jsonObject.put("id", "id_1");
                     jsonObject.put("latitude", myLatitude);
                     jsonObject.put("longitude", myLongitude);
                 } catch (JSONException e) {

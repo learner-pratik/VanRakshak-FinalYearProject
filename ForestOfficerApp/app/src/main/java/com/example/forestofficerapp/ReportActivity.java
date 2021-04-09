@@ -171,7 +171,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         try {
             postData.put("empid", SaveSharedPreference.getEmployeeID(this));
             postData.put("name", SaveSharedPreference.getName(this));
-            postData.put("type", reportType);
+            postData.put("type", reportType.toLowerCase());
             postData.put("description", description);
             postData.put("latitude", geoLatitude);
             postData.put("longitude", geoLongitude);

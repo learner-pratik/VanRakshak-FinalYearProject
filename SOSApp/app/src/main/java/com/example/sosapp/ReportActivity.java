@@ -139,6 +139,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         String userPhoneNumber = SaveSharedPreference.getPhoneNumber(this);
         String address = SaveSharedPreference.getAddress(this);
         String name = reportName.getEditText().getText().toString();
+        String type = reportType.getEditText().getText().toString();
         String description = reportDescription.getEditText().getText().toString();
         String clickedPicture = BitMapToString(photo);
 
@@ -151,7 +152,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
             postData.put("phone_number", userPhoneNumber);
             postData.put("address", address);
             postData.put("report_name", name);
-            postData.put("type", reportType);
+            postData.put("type", type);
             postData.put("description", description);
             postData.put("latitude", geoLatitude);
             postData.put("longitude", geoLongitude);
@@ -183,7 +184,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
             Handler handler = new Handler();
             handler.postDelayed(() -> {
                 reportMessage.setVisibility(View.INVISIBLE);
-//                startMainActivity();
+                startMainActivity();
             }, 2000);
 
         }, error -> {

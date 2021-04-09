@@ -30,12 +30,42 @@ public class TaskCardRecyclerViewAdapter extends RecyclerView.Adapter<TaskCardVi
     public void onBindViewHolder(@NonNull TaskCardViewHolder holder, int position) {
         if (taskList != null && position<taskList.size()) {
             Task task = taskList.get(position);
-            holder.taskName.setText(task.getTaskName());
-            holder.typeName.setText(task.getTaskType());
+            holder.taskName.setText(makeCapital(task.getTaskDescription()));
+            holder.typeName.setText(makeCapital(task.getTaskType()));
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-m-yyyy");
             String deadlineDate = dateFormat.format(task.getTaskDeadline());
             holder.deadline.setText(deadlineDate);
         }
+    }
+
+    private String makeCapital(String text) {
+        // stores each characters to a char array
+        char[] charArray = text.toCharArray();
+        boolean foundSpace = true;
+
+        for(int i = 0; i < charArray.length; i++) {
+
+            // if the array element is a letter
+            if(Character.isLetter(charArray[i])) {
+
+                // check space is present before the letter
+                if(foundSpace) {
+
+                    // change the letter into uppercase
+                    charArray[i] = Character.toUpperCase(charArray[i]);
+                    foundSpace = false;
+                }
+            }
+
+            else {
+                // if the new character is not character
+                foundSpace = true;
+            }
+        }
+
+        // convert the char array to the string
+        String message = String.valueOf(charArray);
+        return message;
     }
 
     @Override

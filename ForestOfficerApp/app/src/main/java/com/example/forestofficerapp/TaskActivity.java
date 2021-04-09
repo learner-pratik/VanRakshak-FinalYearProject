@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -101,9 +103,9 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
 
         taskIndex = getIntent().getIntExtra("taskIndex", 0);
         task = TaskListActivity.taskList.get(taskIndex);
-        taskName.setText(task.getTaskName());
-        taskType.setText(task.getTaskType());
-        taskDescription.setText(task.getTaskDescription());
+        taskName.setText(makeCapital(task.getTaskName()));
+        taskType.setText(makeCapital(task.getTaskType()));
+        taskDescription.setText(makeCapital(task.getTaskDescription()));
         taskAssignedBy.setText(task.getAssignedBy());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-m-yyyy");
         String deadlineDate = dateFormat.format(task.getTaskDeadline());
@@ -117,6 +119,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
 
         taskCameraButton.setOnClickListener(v -> {
             writtenReport = taskReport.getEditText().getText().toString();
+            SaveSharedPreference.setTaskIndex(this, taskIndex);
             SaveSharedPreference.setTaskReport(this, writtenReport);
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
@@ -129,6 +132,35 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         taskCancel.setOnClickListener(v -> {
             goToTaskList();
         });
+    }
+
+    public String BitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream baos = new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+        byte [] b=baos.toByteArray();
+        String temp= Base64.encodeToString(b, Base64.DEFAULT);
+        System.out.println(temp);
+        return temp;
+    }
+
+    private String makeCapital(String text) {
+        char[] charArray = text.toCharArray();
+        boolean foundSpace = true;
+
+        for(int i = 0; i < charArray.length; i++) {
+            if(Character.isLetter(charArray[i])) {
+                if(foundSpace) {
+                    charArray[i] = Character.toUpperCase(charArray[i]);
+                    foundSpace = false;
+                }
+            }
+            else {
+                foundSpace = true;
+            }
+        }
+
+        String message = String.valueOf(charArray);
+        return message;
     }
 
     private void sendTaskReport() {
@@ -145,6 +177,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
             geoLongitude = Double.toString(longitude);
         }
         String url = LoginOptionActivity.BASE_URL+taskURL;
+        String clickedPicture = BitMapToString(photo);
         String reportData = taskReport.getEditText().getText().toString();
         String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
 
@@ -157,6 +190,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
             jsonObject.put("report", reportData);
             jsonObject.put("latitude", geoLatitude);
             jsonObject.put("longitude", geoLongitude);
+            jsonObject.put("image", clickedPicture);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -220,6 +254,7 @@ public class TaskActivity extends AppCompatActivity implements NavigationView.On
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
+            taskIndex = SaveSharedPreference.getTaskIndex(this);
             taskReport.getEditText().setText(SaveSharedPreference.getTaskReport(this));
         }
     }

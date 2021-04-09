@@ -38,7 +38,7 @@ public class AnimalActivity extends AppCompatActivity implements AdapterView.OnI
         categories.add("Person");
         categories.add("Civet");
         categories.add("Deer");
-        categories.add("Wild Pig");
+        categories.add("Tiger");
 
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);

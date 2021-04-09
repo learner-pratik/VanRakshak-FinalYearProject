@@ -17,10 +17,9 @@ public class SaveSharedPreference {
     static final String divisionKey = "PASSWORD";
     static final String employeeIdKey = "EMPLOYEE_ID";
     static final String authTokenKey = "TOKEN";
-    static final String forestServiceKey = "FOREST-SERVICE";
-    static final String messageKey = "MESSAGE";
     static final String reportNameKey = "REPORT-NAME";
     static final String reportDescriptionKey = "REPORT-DESCRIPTION";
+    static final String taskIndexKey = "TASK-INDEX";
     static final String taskReportKey = "TASK-REPORT";
     static final String reportsSubmittedKey = "REPORT-SUBMITTED";
     static final String tasksSubmittedKey = "TASK-SUBMITTED";
@@ -95,6 +94,12 @@ public class SaveSharedPreference {
         editor.commit();
     }
 
+    public static void setTaskIndex(Context ctx, int index) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putInt(taskIndexKey, index);
+        editor.commit();
+    }
+
     public static void setTaskReport(Context ctx, String report) {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.putString(taskReportKey, report);
@@ -155,6 +160,10 @@ public class SaveSharedPreference {
 
     public static String getReportDescription(Context ctx) {
         return getSharedPreferences(ctx).getString(reportDescriptionKey, "");
+    }
+
+    public static int getTaskIndex(Context ctx) {
+        return getSharedPreferences(ctx).getInt(taskIndexKey, 0);
     }
 
     public static String getTaskReport(Context ctx) {
