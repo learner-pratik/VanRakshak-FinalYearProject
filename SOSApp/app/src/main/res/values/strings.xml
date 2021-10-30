@@ -6,6 +6,7 @@
     <string name="cancelButton_name">CANCEL</string>
     <string name="registerPage_name">REGISTRATION DETAILS</string>
     <string name="registerOption_name">OPTIONAL</string>
+    <string name="registerPhone_name">PHONE NUMBER</string>
     <string name="firstNameEditText_name">FIRST NAME</string>
     <string name="lastNameEditText_name">LAST NAME</string>
     <string name="registerUserName_name">NAME</string>
@@ -25,4 +26,6 @@
     <string name="reportDescription_name">Description</string>
     <string name="cameraButton_name">Click Picture</string>
     <string name="reportType_name">Report Type</string>
+    <string name="SOSButtonName">SOS</string>
+    <string name="registerOtpInstruction">ENTER THE RECEIVED OTP</string>
 </resources>

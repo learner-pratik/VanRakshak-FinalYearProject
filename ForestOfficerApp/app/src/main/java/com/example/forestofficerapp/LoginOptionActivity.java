@@ -1,8 +1,11 @@
 package com.example.forestofficerapp;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -21,11 +24,6 @@ public class LoginOptionActivity extends Activity {
 
         Button registerButton = findViewById(R.id.registerButton);
         Button loginButton = findViewById(R.id.loginButton);
-
-        if (!ForestService.isForestServiceRunning) {
-            Intent serviceIntent = new Intent(this, ForestService.class);
-            startService(serviceIntent);
-        }
 
         String loginEmail = SaveSharedPreference.getEmail(this);
         String loginPassword = SaveSharedPreference.getPassword(this);

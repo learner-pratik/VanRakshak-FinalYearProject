@@ -32,7 +32,6 @@ public class CameraAlertFragment extends Fragment {
         return new CameraAlertFragment();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,29 +41,25 @@ public class CameraAlertFragment extends Fragment {
         layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        addAlerts();
-        adapter = new AlertCardRecyclerViewAdapter(cameraAlertList, position -> {
-            Intent mapActivityIntent = new Intent(view.getContext(), MapActivity.class);
-            startActivity(mapActivityIntent);
-        });
-        recyclerView.setAdapter(adapter);
+        adapter = new AlertCardRecyclerViewAdapter(cameraAlertList, new ClickListener() {
+            @Override
+            public void onPositionClicked(int position) {
+                Intent mapActivityIntent = new Intent(view.getContext(), AlertMapActivity.class);
+                mapActivityIntent.putExtra("type", "camera");
+                mapActivityIntent.putExtra("alertIndex", position);
+                startActivity(mapActivityIntent);
+            }
 
+            @Override
+            public void onLongClicked(int position) {
+                Intent reportIntent = new Intent(view.getContext(), ReportActivity.class);
+                reportIntent.putExtra("type", "Alert Report");
+                startActivity(reportIntent);
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
         return view;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void addAlerts() {
-
-        for (int i=0;i<5;i++) {
-            Alert alert = new Alert(
-                    "Hunter spotted",
-                    "Camera Alert",
-                    new Date(),
-                    LocalTime.now(),
-                    19.75463,
-                    79.32012
-            );
-            cameraAlertList.add(alert);
-        }
-    }
 }

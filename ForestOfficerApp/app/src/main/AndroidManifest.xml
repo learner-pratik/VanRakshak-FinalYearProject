@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.forestofficerapp">
 
     <uses-feature android:name="android.hardware.camera"></uses-feature>
@@ -8,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo_removebg_preview"
         android:supportsRtl="true"
+        tools:replace="android:allowBackup"
         android:theme="@style/Theme.Vanrakshak">
         <activity android:name=".LoginOptionActivity">
             <intent-filter>
@@ -29,12 +32,26 @@
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".ReportListActivity"></activity>
         <activity android:name=".ReportActivity"></activity>
-        <activity android:name=".TaskListActivity"></activity>
+        <activity android:name=".TaskListActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".TaskActivity"></activity>
         <activity android:name=".AnimalListActivity"></activity>
-        <activity android:name=".AlertListActivity"></activity>
+        <activity android:name=".AlertListActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".MapActivity"></activity>
-        <service android:name=".ForestService"/>
+        <activity android:name=".AlertMapActivity"></activity>
+        <service
+            android:name=".ForestService"
+            android:enabled="true">
+        </service>
+        <receiver
+            android:name=".ForestReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="RestartService" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

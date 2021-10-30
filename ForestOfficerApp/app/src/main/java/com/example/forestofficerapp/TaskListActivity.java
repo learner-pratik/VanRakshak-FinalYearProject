@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,12 +21,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,6 +44,7 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
 
     private final String LOG_TAG = this.getClass().getSimpleName();
     public static List<Task> taskList = new ArrayList<>();
+    public static final String taskURL = "/task_api/";
 
     private MaterialToolbar topAppBar;
     private DrawerLayout drawerLayout;
@@ -42,12 +52,6 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter adapter;
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        addTasks();
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,40 +67,86 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new TaskCardRecyclerViewAdapter(taskList, position -> {
-            Intent taskPage = new Intent(TaskListActivity.this, TaskActivity.class);
-            taskPage.putExtra("taskIndex", position);
-            startActivity(taskPage);
-        });
-        recyclerView.setAdapter(adapter);
-
+        getTasksToBeCompleted();
     }
 
-    private void addTasks() {
-        for (int i=0; i<10; i++) {
-            Task task1 = new Task(
-                    1,
-                    "Animal",
-                    "Count elephants",
-                    "Only Asian elephants",
-                    "Ravi Nalawade",
-                    new Date()
-            );
-            Task task2 = new Task(
-                    2,
-                    "Animal",
-                    "Feed monkeys",
-                    "African monkeys",
-                    "Ravi Nalawade",
-                    new Date()
-            );
-            if (i%2==0) taskList.add(task1);
-            else taskList.add(task2);
+    private void getTasksToBeCompleted() {
+
+        taskList.clear();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("request", "task");
+            jsonObject.put("empid", SaveSharedPreference.getEmployeeID(this));
+            jsonObject.put("name", SaveSharedPreference.getName(this));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        String url = LoginOptionActivity.BASE_URL+taskURL;
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, jsonObject, response -> {
+
+            try {
+                Log.d(LOG_TAG, response.toString());
+                JSONArray jsonArray = response.getJSONArray("tasks");
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+
+                    JSONObject taskObject = jsonArray.getJSONObject(i);
+                    Task task = new Task();
+
+                    task.setTaskID(taskObject.getString("id"));
+                    task.setTaskType(taskObject.getString("task_type"));
+                    task.setTaskName(taskObject.getString("task_name"));
+                    task.setTaskDescription(taskObject.getString("description"));
+                    task.setAssignedBy(taskObject.getString("assigning_officer"));
+                    Date date = new SimpleDateFormat("yyyy-mm-dd").parse(taskObject.getString("deadline"));
+                    task.setTaskDeadline(date);
+
+                    taskList.add(task);
+                }
+
+                recyclerView = findViewById(R.id.recycler_view);
+                recyclerView.setHasFixedSize(true);
+                layoutManager = new LinearLayoutManager(this);
+                recyclerView.setLayoutManager(layoutManager);
+                adapter = new TaskCardRecyclerViewAdapter(taskList, new ClickListener() {
+                    @Override
+                    public void onPositionClicked(int position) {
+                        Intent taskPage = new Intent(TaskListActivity.this, TaskActivity.class);
+                        taskPage.putExtra("taskIndex", position);
+                        startActivity(taskPage);
+                    }
+
+                    @Override
+                    public void onLongClicked(int position) {
+                        Intent reportIntent = new Intent(TaskListActivity.this, ReportActivity.class);
+                        reportIntent.putExtra("type", "Alert Report");
+                        startActivity(reportIntent);
+                    }
+                });
+                recyclerView.setAdapter(adapter);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }, error -> {
+            Log.d(LOG_TAG, "response not received");
+            error.printStackTrace();
+        }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 
     @Override
@@ -120,6 +170,8 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub
@@ -175,7 +227,12 @@ public class TaskListActivity extends AppCompatActivity implements NavigationVie
     }
 
     private void setNavigationViewListener() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        TextView name = headerView.findViewById(R.id.personName);
+        TextView designation = headerView.findViewById(R.id.personDesignation);
+        name.setText(SaveSharedPreference.getName(this));
+        designation.setText(SaveSharedPreference.getDesignation(this));
         navigationView.setNavigationItemSelectedListener(this);
     }
 

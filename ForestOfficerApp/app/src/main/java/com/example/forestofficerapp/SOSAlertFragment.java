@@ -32,7 +32,6 @@ public class SOSAlertFragment extends Fragment {
         return new SOSAlertFragment();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,26 +41,24 @@ public class SOSAlertFragment extends Fragment {
         layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        addAlerts();
-        adapter = new AlertCardRecyclerViewAdapter(sosAlertList, position -> {
-            Intent mapActivityIntent = new Intent(view.getContext(), MapActivity.class);
-            startActivity(mapActivityIntent);
+        adapter = new SosCardRecyclerViewAdapter(sosAlertList, new ClickListener() {
+            @Override
+            public void onPositionClicked(int position) {
+                Intent mapActivityIntent = new Intent(view.getContext(), AlertMapActivity.class);
+                mapActivityIntent.putExtra("type", "sos");
+                mapActivityIntent.putExtra("alertIndex", position);
+                startActivity(mapActivityIntent);
+            }
+
+            @Override
+            public void onLongClicked(int position) {
+                Intent reportIntent = new Intent(view.getContext(), ReportActivity.class);
+                reportIntent.putExtra("type", "Alert Report");
+                startActivity(reportIntent);
+            }
         });
         recyclerView.setAdapter(adapter);
 
         return view;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void addAlerts() {
-        Alert alert = new Alert(
-                "Animal intrusion",
-                "SOS Alert",
-                new Date(),
-                LocalTime.now(),
-                19.75432,
-                79.12232
-        );
-        sosAlertList.add(alert);
     }
 }

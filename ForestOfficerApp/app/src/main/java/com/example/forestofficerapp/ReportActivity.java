@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -61,10 +62,12 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
     private final String LOG_TAG = this.getClass().getSimpleName();
     private static final String reportURL = "/report_api/";
 
+    private static final int PERMISSIONS_REQUEST = 1;
+    private static final String PERMISSION_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
     private Bitmap photo;
-    private static final int MY_CAMERA_PERMISSION_CODE = 100;
 
     private String reportType;
     private String writtenName, writtenDescription;
@@ -75,9 +78,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
     private ActionBarDrawerToggle drawerToggle;
     private ProgressBar progressBar;
     private TextView progressMessage;
-
-    private int locationRequestCode = 1000;
-    private double wayLatitude = 0.0, wayLongitude = 0.0;
+    private Double latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +90,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         TextView textView = findViewById(R.id.txt_bundle);
         imageView = findViewById(R.id.picture_taken);
         Bundle bundle = getIntent().getExtras();
-        reportType = bundle.get("data").toString();
+        reportType = bundle.get("type").toString();
         textView.setText(reportType);
 
         reportDescription = findViewById(R.id.report_description);
@@ -109,18 +110,17 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+        if (hasPermission()) {
+            getCurrentLocation();
+        } else {
+            requestPermission();
+        }
+
         cameraButton.setOnClickListener(v -> {
-//                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-//                {
-//                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
-//                }
-//                else
-//                {
-//                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
-//                }
             writtenName = reportName.getEditText().getText().toString();
             writtenDescription = reportDescription.getEditText().getText().toString();
+            SaveSharedPreference.setReportName(this, writtenName);
+            SaveSharedPreference.setReportDescription(this, writtenDescription);
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
         });
@@ -150,9 +150,14 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
 
     private void sendReport() {
 
-        String geoLatitude = "19.72718";
-        String geoLongitude = "72.19834";
-        String name = reportName.getEditText().getText().toString();
+        String geoLatitude, geoLongitude;
+        if (latitude==null) {
+            geoLatitude = "19.725894";
+            geoLongitude = "72.321456";
+        } else {
+            geoLatitude = Double.toString(latitude);
+            geoLongitude = Double.toString(longitude);
+        }
         String description = reportDescription.getEditText().getText().toString();
         String url = LoginOptionActivity.BASE_URL+reportURL;
         String clickedPicture = BitMapToString(photo);
@@ -166,7 +171,7 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         try {
             postData.put("empid", SaveSharedPreference.getEmployeeID(this));
             postData.put("name", SaveSharedPreference.getName(this));
-            postData.put("type", reportType);
+            postData.put("type", reportType.toLowerCase());
             postData.put("description", description);
             postData.put("latitude", geoLatitude);
             postData.put("longitude", geoLongitude);
@@ -188,6 +193,8 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
             progressBar.setVisibility(View.INVISIBLE);
             if (status) {
                 progressMessage.setText("REPORT SENT");
+                int r = SaveSharedPreference.getSubmittedReports(this);
+                SaveSharedPreference.setSubmittedReports(this, r+1);
             } else {
                 progressMessage.setText("UNABLE TO SEND REPORT");
             }
@@ -215,6 +222,63 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
     }
 
     @Override
+    public void onRequestPermissionsResult(
+            final int requestCode, final String[] permissions, final int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSIONS_REQUEST) {
+            if (allPermissionsGranted(grantResults)) {
+                getCurrentLocation();
+            } else {
+                requestPermission();
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getCurrentLocation() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+            if (location != null) {
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+                Log.d(LOG_TAG, String.valueOf(latitude));
+                Log.d(LOG_TAG, String.valueOf(longitude));
+            }
+        });
+    }
+
+    private boolean hasPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return checkSelfPermission(PERMISSION_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return true;
+        }
+    }
+
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (shouldShowRequestPermissionRationale(PERMISSION_LOCATION)) {
+                Toast.makeText(
+                        this,
+                        "Location permission is required for this demo",
+                        Toast.LENGTH_LONG)
+                        .show();
+            }
+            requestPermissions(new String[] {PERMISSION_LOCATION}, PERMISSIONS_REQUEST);
+        }
+    }
+
+    private static boolean allPermissionsGranted(final int[] grantResults) {
+        for (int result : grantResults) {
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
@@ -235,6 +299,8 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub
@@ -290,22 +356,13 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
     }
 
     private void setNavigationViewListener() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        TextView name = headerView.findViewById(R.id.personName);
+        TextView designation = headerView.findViewById(R.id.personDesignation);
+        name.setText(SaveSharedPreference.getName(this));
+        designation.setText(SaveSharedPreference.getDesignation(this));
         navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == MY_CAMERA_PERMISSION_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_REQUEST);
-            } else {
-                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
-            }
-        }
     }
 
     @Override
@@ -314,8 +371,8 @@ public class ReportActivity extends AppCompatActivity implements NavigationView.
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
-            reportName.getEditText().setText(writtenName);
-            reportDescription.getEditText().setText(writtenDescription);
+            reportName.getEditText().setText(SaveSharedPreference.getReportName(this));
+            reportDescription.getEditText().setText(SaveSharedPreference.getReportDescription(this));
         }
     }
 }

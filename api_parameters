@@ -66,27 +66,162 @@ response - {
 	"status" : "true/false(boolean)"
 }
 
-6. alert 
+6. Alert (From Server) 
 url - "/alert"
 request - {
 	"alert" : "true"
 }
 response - {
-	"response_type" : "alert",
-	"action" : "<alert_type>",
-	"timestamp" : "<alert_time>",
+	"type" : "<alert_type>" // hunter, sos, working
 	"camera_id" : "<camera_id>",
-	"latitude" : "<latitude>",
-	"longitude" : "<longitude>",
+	"latitude" : "<geo-latitude>",
+	"longitude" : "<geo-longitude>",
+	"timestamp" : "alert-time",
+	"sos_type" : "<sos_alert_type>" // animal intrusion, tree fall, medical emergency, unidentified object, other
+	"name" : "<user_name>",
+	"phone_number" : "<user_phone_number>",
+	"address" : "user_address",
 }
 
 7. task
 response - {
-	"response_type" : "task",
+	"type" : "task",
 	"id" : "<task_id>"
-	"name" : "<task_name>",
-	"type" : "<task_type>",
+	"task_name" : "<task_name>",
+	"task_type" : "<task_type>",
 	"description : "<task_description>",
 	"assigning_offcier" : "<officer_name>",
 	"deadline" : "<task_deadline_date>"
+}
+
+8. Alert (To server)
+url - "/alert_api"
+request - {
+	"type" : "<alert_type>" // hunter, sos, working
+	"camera_id" : "<camera_id>",
+	"latitude" : "<geo-latitude>",
+	"longitude" : "<geo-longitude>",
+	"timestamp" : "alert-time",
+	"sos_type" : "<sos_alert_type>" // animal intrusion, tree fall, medical emergency, unidentified object, other
+	"name" : "<user_name>",
+	"phone_number" : "<user_phone_number>",
+	"address" : "user_address",
+}
+response - {
+	"status" : "true/false" //boolean
+}
+
+9. Localreport 
+url - "/local_report"
+request - {
+	"user_name" : "<name>",
+	"phone_number" : "<phone_number>",
+	"address" : "<user_address>",
+	"report_name" : "<name>",
+	"type" : "<report_type>",
+	"description" : "<report_description>",
+	"latitude" : "<geo_latitude>",
+	"longitude" : "geo_longitude",
+	"image" : "<report_image>",
+}
+response - {
+	"status" : "<true/false>" //boolean
+}
+
+10. Incomplete Tasks 
+url - "get_task"
+request - {
+	"emp_id" : "<employee_id>",
+} // request also has header with Auth Token
+response - {
+	"tasks" : [
+		{
+			"id" : "<task_id>"
+			"task_name" : "<task_name>",
+			"task_type" : "<task_type>",
+			"description : "<task_description>",
+			"assigning_offcier" : "<officer_name>",
+			"deadline" : "<task_deadline_date>"
+		},
+		{
+			"id" : "<task_id>"
+			"task_name" : "<task_name>",
+			"task_type" : "<task_type>",
+			"description : "<task_description>",
+			"assigning_offcier" : "<officer_name>",
+			"deadline" : "<task_deadline_date>"
+		}, 
+		
+	]
+} // response is json object with task key and jsonarray as value
+
+11. Animal response from GPS app
+url - "/animal_socket"
+request - {
+	"animal" : "<animal_name>",
+	"id" : "<animal_id>",
+	"latitude" : "<geo_latitude>",
+	"longitude" : "<geo_longitude>"
+}
+
+12. Animal response from server
+url - "/animal_socket"
+request - {
+	"animals" : [
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+			"latitude" : "<geo_latitude>",
+			"longitude" : "<geo_longitude>"	
+		}
+	]
+}
+
+13. Animal list for dropdown
+url - "/animal_api"
+request - {
+	"empid" : "<employee_id>"
+}
+response - {
+	"animals" : [
+		{
+			"animal" : "<animal_name>",
+			"id" : ["id_1", "id_2"],
+		},
+		{
+			"animal" : "<animal_name>",
+			"id" : ["id_1", "id_2"],
+		},
+	]
+}
+
+14. Animal location request 
+url - "/animal_list"
+request - {
+	"animals" : [
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+		},
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+		},
+	]
+}
+response - {
+	"animals" : [
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+			"latitue" : "<geo_latitude>",
+			"longitude" : "<geo_longitude>",
+		},
+		{
+			"animal" : "<animal_name>",
+			"id" : "<animal_id>",
+			"latitue" : "<geo_latitude>",
+			"longitude" : "<geo_longitude>",
+		},
+	]
 }

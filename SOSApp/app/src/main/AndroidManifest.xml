@@ -7,12 +7,13 @@
     <uses-permission android:name="android.permission.SEND_SMS"/>
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/logo_removebg_preview"
         android:supportsRtl="true"
         android:theme="@style/Theme.Vanrakshak">
         <activity android:name=".PhoneRegisterActivity">
@@ -21,6 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".RegisterOtpActivity"></activity>
         <activity android:name=".RegistrationPageActivity"></activity>
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".ReportActivity"></activity>

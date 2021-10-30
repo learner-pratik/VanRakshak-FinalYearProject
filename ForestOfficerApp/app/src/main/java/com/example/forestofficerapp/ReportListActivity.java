@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -81,7 +82,7 @@ public class ReportListActivity extends AppCompatActivity implements AdapterView
 
         button.setOnClickListener(v -> {
             Intent intent= new Intent(ReportListActivity.this,ReportActivity.class);
-            intent.putExtra("data",String.valueOf(spinner.getSelectedItem()));
+            intent.putExtra("type",String.valueOf(spinner.getSelectedItem()));
             startActivity(intent);
         });
     }
@@ -121,6 +122,8 @@ public class ReportListActivity extends AppCompatActivity implements AdapterView
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub
@@ -176,7 +179,12 @@ public class ReportListActivity extends AppCompatActivity implements AdapterView
     }
 
     private void setNavigationViewListener() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        TextView name = headerView.findViewById(R.id.personName);
+        TextView designation = headerView.findViewById(R.id.personDesignation);
+        name.setText(SaveSharedPreference.getName(this));
+        designation.setText(SaveSharedPreference.getDesignation(this));
         navigationView.setNavigationItemSelectedListener(this);
     }
 }

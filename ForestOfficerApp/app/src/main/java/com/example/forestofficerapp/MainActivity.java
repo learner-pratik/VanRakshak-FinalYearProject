@@ -7,6 +7,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -43,10 +45,14 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -55,33 +61,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MaterialToolbar topAppBar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private TextView name, email, designation, beat, range, division, headerOfficerName, headerOfficerDesignation;
+    private TextView name, email, designation, beat, range, division, reportsSent, taskCompleted;
     public static final String logoutURL = "/logout/";
+    public static final String animalListURL = "/animal_api/";
+    public static Map<String, List<String>> map = new HashMap<>();
 
-    public static FusedLocationProviderClient fusedLocationProviderClient;
-    public static Location currentLocation;
-    public static LocationCallback locationCallback;
+    Intent forestServiceIntent;
+    private ForestService forestService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getLastDeviceLocation();
-
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    currentLocation = location;
-                }
-            }
-        };
-
-        createLocationRequest();
+        forestService = new ForestService();
+        forestServiceIntent = new Intent(this, forestService.getClass());
+        if (!isMyServiceRunning(forestServiceIntent.getClass())) {
+            startService(forestServiceIntent);
+        }
 
         topAppBar = findViewById(R.id.topAppbar);
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -91,8 +88,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         beat = findViewById(R.id.profileBeatName);
         range = findViewById(R.id.profileRangeName);
         division = findViewById(R.id.profileDivisionName);
-        headerOfficerName = findViewById(R.id.personName);
-        headerOfficerDesignation = findViewById(R.id.personDesignation);
+        reportsSent = findViewById(R.id.profileReportsSubmitted);
+        taskCompleted = findViewById(R.id.profileTasksCompleted);
 
         setSupportActionBar(topAppBar);
         setNavigationViewListener();
@@ -106,69 +103,74 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         beat.setText(SaveSharedPreference.getBeat(this));
         range.setText(SaveSharedPreference.getRange(this));
         division.setText(SaveSharedPreference.getDivision(this));
-//        headerOfficerName.setText(SaveSharedPreference.getName(this));
-//        headerOfficerDesignation.setText(SaveSharedPreference.getDesignation(this));
+        reportsSent.setText(String.valueOf(SaveSharedPreference.getSubmittedReports(this)));
+        taskCompleted.setText(String.valueOf(SaveSharedPreference.getSubmittedTasks(this)));
+
+        if (map.isEmpty()) getAnimalList();
     }
 
-    private void getLastDeviceLocation() {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            Log.d(LOG_TAG, "did not get permission");
-            return;
+    private void getAnimalList() {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("empid", SaveSharedPreference.getEmployeeID(this));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        fusedLocationProviderClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    if (location != null) {
-                        currentLocation = location;
-                        Log.d(LOG_TAG, "Printing current location");
-                        Log.d(LOG_TAG, String.valueOf(currentLocation.getLatitude()));
-                        Log.d(LOG_TAG, String.valueOf(currentLocation.getLongitude()));
-                    } else {
-                        Log.d(LOG_TAG, "Retrieving location failed");
+
+        String authToken = "Token "+SaveSharedPreference.getAuthToken(this);
+        String url = LoginOptionActivity.BASE_URL+animalListURL;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                url, jsonObject, response -> {
+            Log.d(LOG_TAG, response.toString());
+
+            try {
+                JSONArray jsonArray = response.getJSONArray("animals");
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    String animalName = object.getString("animal");
+                    JSONArray array = object.getJSONArray("id");
+                    List<String> list = new ArrayList<>();
+
+                    for (int j = 0; j < array.length(); j++) {
+                        list.add(array.getString(j));
                     }
-                });
 
+                    map.put(animalName, list);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }, error -> {
+            Log.d(LOG_TAG, "post request failed");
+            error.printStackTrace();
+        }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
+                params.put("Authorization", authToken);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
     }
 
-    protected void createLocationRequest() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("Service status", "Running");
+                return true;
+            }
         }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,
-                locationCallback,
-                Looper.getMainLooper());
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        stopLocationUpdates();
-        Intent serviceIntent = new Intent(this, ForestService.class);
-        stopService(serviceIntent);
-    }
-
-    private void stopLocationUpdates() {
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        Log.i ("Service status", "Not running");
+        return false;
     }
 
     @Override
@@ -191,11 +193,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 response -> {
                     // response
-                    Log.d("Logout-response", response);
+                    Log.d(LOG_TAG,"Logout-response : " + response);
+                    ForestService.logoutOption = true;
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub
-                    Log.d("ERROR","error => "+error.toString());
+                    Log.d(LOG_TAG,"error => "+error.toString());
                 }
         ) {
             @Override
@@ -247,7 +252,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setNavigationViewListener() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        TextView name = headerView.findViewById(R.id.personName);
+        TextView designation = headerView.findViewById(R.id.personDesignation);
+        name.setText(SaveSharedPreference.getName(this));
+        designation.setText(SaveSharedPreference.getDesignation(this));
         navigationView.setNavigationItemSelectedListener(this);
     }
 }

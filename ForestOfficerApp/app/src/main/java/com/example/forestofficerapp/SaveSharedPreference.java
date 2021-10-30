@@ -17,6 +17,12 @@ public class SaveSharedPreference {
     static final String divisionKey = "PASSWORD";
     static final String employeeIdKey = "EMPLOYEE_ID";
     static final String authTokenKey = "TOKEN";
+    static final String reportNameKey = "REPORT-NAME";
+    static final String reportDescriptionKey = "REPORT-DESCRIPTION";
+    static final String taskIndexKey = "TASK-INDEX";
+    static final String taskReportKey = "TASK-REPORT";
+    static final String reportsSubmittedKey = "REPORT-SUBMITTED";
+    static final String tasksSubmittedKey = "TASK-SUBMITTED";
 
     static SharedPreferences getSharedPreferences(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -76,6 +82,42 @@ public class SaveSharedPreference {
         editor.commit();
     }
 
+    public static void setReportName(Context ctx, String name) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(reportNameKey, name);
+        editor.commit();
+    }
+
+    public static void setReportDescription(Context ctx, String description) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(reportDescriptionKey, description);
+        editor.commit();
+    }
+
+    public static void setTaskIndex(Context ctx, int index) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putInt(taskIndexKey, index);
+        editor.commit();
+    }
+
+    public static void setTaskReport(Context ctx, String report) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putString(taskReportKey, report);
+        editor.commit();
+    }
+
+    public static void setSubmittedReports(Context ctx, int num) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putInt(reportsSubmittedKey, num);
+        editor.commit();
+    }
+
+    public static void setSubmittedTasks(Context ctx, int num) {
+        SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
+        editor.putInt(tasksSubmittedKey, num);
+        editor.commit();
+    }
+
     public static String getEmail(Context ctx) {
         return getSharedPreferences(ctx).getString(emailKey, "");
     }
@@ -110,6 +152,30 @@ public class SaveSharedPreference {
 
     public static String getAuthToken(Context ctx) {
         return getSharedPreferences(ctx).getString(authTokenKey, "");
+    }
+
+    public static String getReportName(Context ctx) {
+        return getSharedPreferences(ctx).getString(reportNameKey, "");
+    }
+
+    public static String getReportDescription(Context ctx) {
+        return getSharedPreferences(ctx).getString(reportDescriptionKey, "");
+    }
+
+    public static int getTaskIndex(Context ctx) {
+        return getSharedPreferences(ctx).getInt(taskIndexKey, 0);
+    }
+
+    public static String getTaskReport(Context ctx) {
+        return getSharedPreferences(ctx).getString(taskReportKey, "");
+    }
+
+    public static int getSubmittedReports(Context ctx) {
+        return getSharedPreferences(ctx).getInt(reportsSubmittedKey, 0);
+    }
+
+    public static int getSubmittedTasks(Context ctx) {
+        return getSharedPreferences(ctx).getInt(tasksSubmittedKey, 0);
     }
 
     public static void clearPreferences(Context ctx) {

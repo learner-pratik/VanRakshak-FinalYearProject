@@ -8,11 +8,10 @@
     android:layout_height="match_parent"
     tools:context=".AnimalListActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        android:orientation="vertical">
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
@@ -30,7 +29,68 @@
                 app:menu="@menu/appbar_menu" />
         </com.google.android.material.appbar.AppBarLayout>
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/animalListLayout"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:layout_above="@id/animalListIdLayout">
+
+            <!-- Text Label -->
+            <TextView
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Animal:"
+                android:layout_marginBottom="5dp"
+                />
+
+            <!-- Spinner Element -->
+            <Spinner
+                android:id="@+id/animalSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/animalListIdLayout"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:layout_centerInParent="true">
+
+            <!-- Text Label -->
+            <TextView
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Animal-Id:"
+                android:layout_marginBottom="5dp"
+                />
+
+            <!-- Spinner Element -->
+            <Spinner
+                android:id="@+id/animalIdSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/animalListNextButton"
+            style="@style/Widget.Vanrakshak.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:text="NEXT"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"

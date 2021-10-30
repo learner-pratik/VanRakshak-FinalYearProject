@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,7 +63,6 @@ public class AlertListActivity extends AppCompatActivity implements NavigationVi
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         setUpTabIcons();
-
     }
 
     private void setUpTabIcons() {
@@ -90,6 +91,8 @@ public class AlertListActivity extends AppCompatActivity implements NavigationVi
                 response -> {
                     // response
                     Log.d("Logout-response", response);
+                    Intent serviceIntent = new Intent(this, ForestService.class);
+                    stopService(serviceIntent);
                 },
                 error -> {
                     // TODO Auto-generated method stub
@@ -145,7 +148,12 @@ public class AlertListActivity extends AppCompatActivity implements NavigationVi
     }
 
     private void setNavigationViewListener() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        TextView name = headerView.findViewById(R.id.personName);
+        TextView designation = headerView.findViewById(R.id.personDesignation);
+        name.setText(SaveSharedPreference.getName(this));
+        designation.setText(SaveSharedPreference.getDesignation(this));
         navigationView.setNavigationItemSelectedListener(this);
     }
 }
