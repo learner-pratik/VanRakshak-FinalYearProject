@@ -11,6 +11,7 @@ from django.utils import timezone
 from .models import *
 from django.http import HttpResponse,JsonResponse
 import json
+import xlsxwriter
 
 ############################SERVER########################################
 def logout_server(request):
@@ -556,6 +557,49 @@ def localreportlist(request):
         rep_dic['longitude']=lr.longitude
         main_dict.append(rep_dic)
     return render(request,"localreportlist.html",{"main_dict":main_dict})
+
+def getexcelanimal(request):
+    workbook = xlsxwriter.Workbook('main/static/data.xlsx')
+    worksheet = workbook.add_worksheet()  
+    row = 0
+    column = 0
+    a=Animal.objects.all()
+    aid=[]
+    atype=[]
+    lat=[]
+    lon=[]
+    for i in a:
+        item=i.animal_id
+        worksheet.write(row, column, item)
+        column+=1
+        item=i.animal_info
+        worksheet.write(row, column, item)
+        column+=1
+        for j in range(len(i.latitude)):
+            item=i.latitude[j]
+            worksheet.write(row, column, item)
+            column+=1
+            item=i.longitude[j]
+            worksheet.write(row, column, item)
+            column-=1
+            row+=1
+        column-=2
+    # content = ["ankit", "rahul", "priya", "harshita", 
+    #                     "sumit", "neeraj", "shivam"] 
+
+    # for item in content : 
+    #     worksheet.write(row, column, item) 
+    #     row += 1
+        
+    workbook.close() 
+    
+    path = 'main/static/data.xlsx' # this should live elsewhere, definitely
+    with open(path, "rb") as excel:
+        data = excel.read()
+
+    response = HttpResponse(data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=data.xlsx'
+    return response
 
 #############################API##########################################
 
